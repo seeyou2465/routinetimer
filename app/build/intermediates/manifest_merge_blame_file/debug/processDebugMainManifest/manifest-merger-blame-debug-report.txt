@@ -1,0 +1,235 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.routinealarm"
+4    android:versionCode="1"
+5    android:versionName="1.0" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="26"
+9        android:targetSdkVersion="34" />
+10
+11    <!-- アラーム・通知関連権限 -->
+12    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+12-->C:\Users\socce\Documents\開発\ルーティンアラーム\app\src\main\AndroidManifest.xml:5:5-81
+12-->C:\Users\socce\Documents\開発\ルーティンアラーム\app\src\main\AndroidManifest.xml:5:22-78
+13    <uses-permission android:name="android.permission.VIBRATE" />
+13-->C:\Users\socce\Documents\開発\ルーティンアラーム\app\src\main\AndroidManifest.xml:6:5-66
+13-->C:\Users\socce\Documents\開発\ルーティンアラーム\app\src\main\AndroidManifest.xml:6:22-63
+14    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
+14-->C:\Users\socce\Documents\開発\ルーティンアラーム\app\src\main\AndroidManifest.xml:7:5-81
+14-->C:\Users\socce\Documents\開発\ルーティンアラーム\app\src\main\AndroidManifest.xml:7:22-78
+15    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+15-->C:\Users\socce\Documents\開発\ルーティンアラーム\app\src\main\AndroidManifest.xml:8:5-77
+15-->C:\Users\socce\Documents\開発\ルーティンアラーム\app\src\main\AndroidManifest.xml:8:22-74
+16    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+16-->C:\Users\socce\Documents\開発\ルーティンアラーム\app\src\main\AndroidManifest.xml:9:5-79
+16-->C:\Users\socce\Documents\開発\ルーティンアラーム\app\src\main\AndroidManifest.xml:9:22-76
+17    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+17-->C:\Users\socce\Documents\開発\ルーティンアラーム\app\src\main\AndroidManifest.xml:10:5-74
+17-->C:\Users\socce\Documents\開発\ルーティンアラーム\app\src\main\AndroidManifest.xml:10:22-71
+18    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+18-->C:\Users\socce\Documents\開発\ルーティンアラーム\app\src\main\AndroidManifest.xml:11:5-95
+18-->C:\Users\socce\Documents\開発\ルーティンアラーム\app\src\main\AndroidManifest.xml:11:22-92
+19    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+19-->C:\Users\socce\Documents\開発\ルーティンアラーム\app\src\main\AndroidManifest.xml:12:5-77
+19-->C:\Users\socce\Documents\開発\ルーティンアラーム\app\src\main\AndroidManifest.xml:12:22-74
+20    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+20-->C:\Users\socce\Documents\開発\ルーティンアラーム\app\src\main\AndroidManifest.xml:13:5-92
+20-->C:\Users\socce\Documents\開発\ルーティンアラーム\app\src\main\AndroidManifest.xml:13:22-89
+21    <uses-permission android:name="android.permission.WAKE_LOCK" />
+21-->C:\Users\socce\Documents\開発\ルーティンアラーム\app\src\main\AndroidManifest.xml:14:5-68
+21-->C:\Users\socce\Documents\開発\ルーティンアラーム\app\src\main\AndroidManifest.xml:14:22-65
+22    <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
+22-->C:\Users\socce\Documents\開発\ルーティンアラーム\app\src\main\AndroidManifest.xml:15:5-75
+22-->C:\Users\socce\Documents\開発\ルーティンアラーム\app\src\main\AndroidManifest.xml:15:22-72
+23    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+23-->C:\Users\socce\Documents\開発\ルーティンアラーム\app\src\main\AndroidManifest.xml:16:5-78
+23-->C:\Users\socce\Documents\開発\ルーティンアラーム\app\src\main\AndroidManifest.xml:16:22-75
+24
+25    <permission
+25-->[androidx.core:core:1.13.1] C:\Users\socce\.gradle\caches\9.0-milestone-1\transforms\68c3625ebd199b5553e33d32af0f04f6\transformed\core-1.13.1\AndroidManifest.xml:22:5-24:47
+26        android:name="com.routinealarm.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+26-->[androidx.core:core:1.13.1] C:\Users\socce\.gradle\caches\9.0-milestone-1\transforms\68c3625ebd199b5553e33d32af0f04f6\transformed\core-1.13.1\AndroidManifest.xml:23:9-81
+27        android:protectionLevel="signature" />
+27-->[androidx.core:core:1.13.1] C:\Users\socce\.gradle\caches\9.0-milestone-1\transforms\68c3625ebd199b5553e33d32af0f04f6\transformed\core-1.13.1\AndroidManifest.xml:24:9-44
+28
+29    <uses-permission android:name="com.routinealarm.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+29-->[androidx.core:core:1.13.1] C:\Users\socce\.gradle\caches\9.0-milestone-1\transforms\68c3625ebd199b5553e33d32af0f04f6\transformed\core-1.13.1\AndroidManifest.xml:26:5-97
+29-->[androidx.core:core:1.13.1] C:\Users\socce\.gradle\caches\9.0-milestone-1\transforms\68c3625ebd199b5553e33d32af0f04f6\transformed\core-1.13.1\AndroidManifest.xml:26:22-94
+30
+31    <application
+31-->C:\Users\socce\Documents\開発\ルーティンアラーム\app\src\main\AndroidManifest.xml:18:5-67:19
+32        android:name="com.routinealarm.RoutineAlarmApp"
+32-->C:\Users\socce\Documents\開発\ルーティンアラーム\app\src\main\AndroidManifest.xml:19:9-40
+33        android:allowBackup="true"
+33-->C:\Users\socce\Documents\開発\ルーティンアラーム\app\src\main\AndroidManifest.xml:20:9-35
+34        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+34-->[androidx.core:core:1.13.1] C:\Users\socce\.gradle\caches\9.0-milestone-1\transforms\68c3625ebd199b5553e33d32af0f04f6\transformed\core-1.13.1\AndroidManifest.xml:28:18-86
+35        android:debuggable="true"
+36        android:extractNativeLibs="false"
+37        android:icon="@drawable/ic_alarm"
+37-->C:\Users\socce\Documents\開発\ルーティンアラーム\app\src\main\AndroidManifest.xml:21:9-42
+38        android:label="@string/app_name"
+38-->C:\Users\socce\Documents\開発\ルーティンアラーム\app\src\main\AndroidManifest.xml:22:9-41
+39        android:roundIcon="@drawable/ic_alarm"
+39-->C:\Users\socce\Documents\開発\ルーティンアラーム\app\src\main\AndroidManifest.xml:23:9-47
+40        android:supportsRtl="true"
+40-->C:\Users\socce\Documents\開発\ルーティンアラーム\app\src\main\AndroidManifest.xml:24:9-35
+41        android:testOnly="true"
+42        android:theme="@style/Theme.RoutineAlarm" >
+42-->C:\Users\socce\Documents\開発\ルーティンアラーム\app\src\main\AndroidManifest.xml:25:9-50
+43
+44        <!-- メインActivity -->
+45        <activity
+45-->C:\Users\socce\Documents\開発\ルーティンアラーム\app\src\main\AndroidManifest.xml:28:9-35:20
+46            android:name="com.routinealarm.MainActivity"
+46-->C:\Users\socce\Documents\開発\ルーティンアラーム\app\src\main\AndroidManifest.xml:29:13-41
+47            android:exported="true" >
+47-->C:\Users\socce\Documents\開発\ルーティンアラーム\app\src\main\AndroidManifest.xml:30:13-36
+48            <intent-filter>
+48-->C:\Users\socce\Documents\開発\ルーティンアラーム\app\src\main\AndroidManifest.xml:31:13-34:29
+49                <action android:name="android.intent.action.MAIN" />
+49-->C:\Users\socce\Documents\開発\ルーティンアラーム\app\src\main\AndroidManifest.xml:32:17-69
+49-->C:\Users\socce\Documents\開発\ルーティンアラーム\app\src\main\AndroidManifest.xml:32:25-66
+50
+51                <category android:name="android.intent.category.LAUNCHER" />
+51-->C:\Users\socce\Documents\開発\ルーティンアラーム\app\src\main\AndroidManifest.xml:33:17-77
+51-->C:\Users\socce\Documents\開発\ルーティンアラーム\app\src\main\AndroidManifest.xml:33:27-74
+52            </intent-filter>
+53        </activity>
+54
+55        <!-- アラーム全画面Activity -->
+56        <activity
+56-->C:\Users\socce\Documents\開発\ルーティンアラーム\app\src\main\AndroidManifest.xml:38:9-45:51
+57            android:name="com.routinealarm.ui.alarm.AlarmActivity"
+57-->C:\Users\socce\Documents\開発\ルーティンアラーム\app\src\main\AndroidManifest.xml:39:13-51
+58            android:excludeFromRecents="true"
+58-->C:\Users\socce\Documents\開発\ルーティンアラーム\app\src\main\AndroidManifest.xml:44:13-46
+59            android:exported="false"
+59-->C:\Users\socce\Documents\開発\ルーティンアラーム\app\src\main\AndroidManifest.xml:40:13-37
+60            android:launchMode="singleInstance"
+60-->C:\Users\socce\Documents\開発\ルーティンアラーム\app\src\main\AndroidManifest.xml:45:13-48
+61            android:showOnLockScreen="true"
+61-->C:\Users\socce\Documents\開発\ルーティンアラーム\app\src\main\AndroidManifest.xml:41:13-44
+62            android:taskAffinity=""
+62-->C:\Users\socce\Documents\開発\ルーティンアラーム\app\src\main\AndroidManifest.xml:43:13-36
+63            android:turnScreenOn="true" />
+63-->C:\Users\socce\Documents\開発\ルーティンアラーム\app\src\main\AndroidManifest.xml:42:13-40
+64
+65        <!-- アラーム発火BroadcastReceiver -->
+66        <receiver
+66-->C:\Users\socce\Documents\開発\ルーティンアラーム\app\src\main\AndroidManifest.xml:48:9-50:40
+67            android:name="com.routinealarm.service.AlarmBroadcastReceiver"
+67-->C:\Users\socce\Documents\開発\ルーティンアラーム\app\src\main\AndroidManifest.xml:49:13-59
+68            android:exported="false" />
+68-->C:\Users\socce\Documents\開発\ルーティンアラーム\app\src\main\AndroidManifest.xml:50:13-37
+69
+70        <!-- 端末再起動BroadcastReceiver -->
+71        <receiver
+71-->C:\Users\socce\Documents\開発\ルーティンアラーム\app\src\main\AndroidManifest.xml:53:9-59:20
+72            android:name="com.routinealarm.service.BootReceiver"
+72-->C:\Users\socce\Documents\開発\ルーティンアラーム\app\src\main\AndroidManifest.xml:54:13-49
+73            android:exported="true" >
+73-->C:\Users\socce\Documents\開発\ルーティンアラーム\app\src\main\AndroidManifest.xml:55:13-36
+74            <intent-filter>
+74-->C:\Users\socce\Documents\開発\ルーティンアラーム\app\src\main\AndroidManifest.xml:56:13-58:29
+75                <action android:name="android.intent.action.BOOT_COMPLETED" />
+75-->C:\Users\socce\Documents\開発\ルーティンアラーム\app\src\main\AndroidManifest.xml:57:17-79
+75-->C:\Users\socce\Documents\開発\ルーティンアラーム\app\src\main\AndroidManifest.xml:57:25-76
+76            </intent-filter>
+77        </receiver>
+78
+79        <!-- アラームForegroundService -->
+80        <service
+80-->C:\Users\socce\Documents\開発\ルーティンアラーム\app\src\main\AndroidManifest.xml:62:9-65:61
+81            android:name="com.routinealarm.service.AlarmService"
+81-->C:\Users\socce\Documents\開発\ルーティンアラーム\app\src\main\AndroidManifest.xml:63:13-49
+82            android:exported="false"
+82-->C:\Users\socce\Documents\開発\ルーティンアラーム\app\src\main\AndroidManifest.xml:64:13-37
+83            android:foregroundServiceType="mediaPlayback" />
+83-->C:\Users\socce\Documents\開発\ルーティンアラーム\app\src\main\AndroidManifest.xml:65:13-58
+84
+85        <provider
+85-->[androidx.emoji2:emoji2:1.3.0] C:\Users\socce\.gradle\caches\9.0-milestone-1\transforms\1a47de30d4ae927093bf2dbaed12b800\transformed\emoji2-1.3.0\AndroidManifest.xml:24:9-32:20
+86            android:name="androidx.startup.InitializationProvider"
+86-->[androidx.emoji2:emoji2:1.3.0] C:\Users\socce\.gradle\caches\9.0-milestone-1\transforms\1a47de30d4ae927093bf2dbaed12b800\transformed\emoji2-1.3.0\AndroidManifest.xml:25:13-67
+87            android:authorities="com.routinealarm.androidx-startup"
+87-->[androidx.emoji2:emoji2:1.3.0] C:\Users\socce\.gradle\caches\9.0-milestone-1\transforms\1a47de30d4ae927093bf2dbaed12b800\transformed\emoji2-1.3.0\AndroidManifest.xml:26:13-68
+88            android:exported="false" >
+88-->[androidx.emoji2:emoji2:1.3.0] C:\Users\socce\.gradle\caches\9.0-milestone-1\transforms\1a47de30d4ae927093bf2dbaed12b800\transformed\emoji2-1.3.0\AndroidManifest.xml:27:13-37
+89            <meta-data
+89-->[androidx.emoji2:emoji2:1.3.0] C:\Users\socce\.gradle\caches\9.0-milestone-1\transforms\1a47de30d4ae927093bf2dbaed12b800\transformed\emoji2-1.3.0\AndroidManifest.xml:29:13-31:52
+90                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+90-->[androidx.emoji2:emoji2:1.3.0] C:\Users\socce\.gradle\caches\9.0-milestone-1\transforms\1a47de30d4ae927093bf2dbaed12b800\transformed\emoji2-1.3.0\AndroidManifest.xml:30:17-75
+91                android:value="androidx.startup" />
+91-->[androidx.emoji2:emoji2:1.3.0] C:\Users\socce\.gradle\caches\9.0-milestone-1\transforms\1a47de30d4ae927093bf2dbaed12b800\transformed\emoji2-1.3.0\AndroidManifest.xml:31:17-49
+92            <meta-data
+92-->[androidx.lifecycle:lifecycle-process:2.8.6] C:\Users\socce\.gradle\caches\9.0-milestone-1\transforms\0ebd06c5d1b00e0b8933d674fcd5bccb\transformed\lifecycle-process-2.8.6\AndroidManifest.xml:29:13-31:52
+93                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+93-->[androidx.lifecycle:lifecycle-process:2.8.6] C:\Users\socce\.gradle\caches\9.0-milestone-1\transforms\0ebd06c5d1b00e0b8933d674fcd5bccb\transformed\lifecycle-process-2.8.6\AndroidManifest.xml:30:17-78
+94                android:value="androidx.startup" />
+94-->[androidx.lifecycle:lifecycle-process:2.8.6] C:\Users\socce\.gradle\caches\9.0-milestone-1\transforms\0ebd06c5d1b00e0b8933d674fcd5bccb\transformed\lifecycle-process-2.8.6\AndroidManifest.xml:31:17-49
+95            <meta-data
+95-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\socce\.gradle\caches\9.0-milestone-1\transforms\09451cc41b0458bc3ec50756d3d7df69\transformed\profileinstaller-1.3.1\AndroidManifest.xml:29:13-31:52
+96                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+96-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\socce\.gradle\caches\9.0-milestone-1\transforms\09451cc41b0458bc3ec50756d3d7df69\transformed\profileinstaller-1.3.1\AndroidManifest.xml:30:17-85
+97                android:value="androidx.startup" />
+97-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\socce\.gradle\caches\9.0-milestone-1\transforms\09451cc41b0458bc3ec50756d3d7df69\transformed\profileinstaller-1.3.1\AndroidManifest.xml:31:17-49
+98        </provider>
+99
+100        <activity
+100-->[androidx.compose.ui:ui-tooling-android:1.6.8] C:\Users\socce\.gradle\caches\9.0-milestone-1\transforms\6ca2088a061b485e6341cb2d48d6251d\transformed\ui-tooling-release\AndroidManifest.xml:23:9-25:39
+101            android:name="androidx.compose.ui.tooling.PreviewActivity"
+101-->[androidx.compose.ui:ui-tooling-android:1.6.8] C:\Users\socce\.gradle\caches\9.0-milestone-1\transforms\6ca2088a061b485e6341cb2d48d6251d\transformed\ui-tooling-release\AndroidManifest.xml:24:13-71
+102            android:exported="true" />
+102-->[androidx.compose.ui:ui-tooling-android:1.6.8] C:\Users\socce\.gradle\caches\9.0-milestone-1\transforms\6ca2088a061b485e6341cb2d48d6251d\transformed\ui-tooling-release\AndroidManifest.xml:25:13-36
+103
+104        <service
+104-->[androidx.room:room-runtime:2.6.1] C:\Users\socce\.gradle\caches\9.0-milestone-1\transforms\9bde184af8a61af1867ffb6e9df7b612\transformed\room-runtime-2.6.1\AndroidManifest.xml:24:9-28:63
+105            android:name="androidx.room.MultiInstanceInvalidationService"
+105-->[androidx.room:room-runtime:2.6.1] C:\Users\socce\.gradle\caches\9.0-milestone-1\transforms\9bde184af8a61af1867ffb6e9df7b612\transformed\room-runtime-2.6.1\AndroidManifest.xml:25:13-74
+106            android:directBootAware="true"
+106-->[androidx.room:room-runtime:2.6.1] C:\Users\socce\.gradle\caches\9.0-milestone-1\transforms\9bde184af8a61af1867ffb6e9df7b612\transformed\room-runtime-2.6.1\AndroidManifest.xml:26:13-43
+107            android:exported="false" />
+107-->[androidx.room:room-runtime:2.6.1] C:\Users\socce\.gradle\caches\9.0-milestone-1\transforms\9bde184af8a61af1867ffb6e9df7b612\transformed\room-runtime-2.6.1\AndroidManifest.xml:27:13-37
+108
+109        <receiver
+109-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\socce\.gradle\caches\9.0-milestone-1\transforms\09451cc41b0458bc3ec50756d3d7df69\transformed\profileinstaller-1.3.1\AndroidManifest.xml:34:9-52:20
+110            android:name="androidx.profileinstaller.ProfileInstallReceiver"
+110-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\socce\.gradle\caches\9.0-milestone-1\transforms\09451cc41b0458bc3ec50756d3d7df69\transformed\profileinstaller-1.3.1\AndroidManifest.xml:35:13-76
+111            android:directBootAware="false"
+111-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\socce\.gradle\caches\9.0-milestone-1\transforms\09451cc41b0458bc3ec50756d3d7df69\transformed\profileinstaller-1.3.1\AndroidManifest.xml:36:13-44
+112            android:enabled="true"
+112-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\socce\.gradle\caches\9.0-milestone-1\transforms\09451cc41b0458bc3ec50756d3d7df69\transformed\profileinstaller-1.3.1\AndroidManifest.xml:37:13-35
+113            android:exported="true"
+113-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\socce\.gradle\caches\9.0-milestone-1\transforms\09451cc41b0458bc3ec50756d3d7df69\transformed\profileinstaller-1.3.1\AndroidManifest.xml:38:13-36
+114            android:permission="android.permission.DUMP" >
+114-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\socce\.gradle\caches\9.0-milestone-1\transforms\09451cc41b0458bc3ec50756d3d7df69\transformed\profileinstaller-1.3.1\AndroidManifest.xml:39:13-57
+115            <intent-filter>
+115-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\socce\.gradle\caches\9.0-milestone-1\transforms\09451cc41b0458bc3ec50756d3d7df69\transformed\profileinstaller-1.3.1\AndroidManifest.xml:40:13-42:29
+116                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
+116-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\socce\.gradle\caches\9.0-milestone-1\transforms\09451cc41b0458bc3ec50756d3d7df69\transformed\profileinstaller-1.3.1\AndroidManifest.xml:41:17-91
+116-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\socce\.gradle\caches\9.0-milestone-1\transforms\09451cc41b0458bc3ec50756d3d7df69\transformed\profileinstaller-1.3.1\AndroidManifest.xml:41:25-88
+117            </intent-filter>
+118            <intent-filter>
+118-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\socce\.gradle\caches\9.0-milestone-1\transforms\09451cc41b0458bc3ec50756d3d7df69\transformed\profileinstaller-1.3.1\AndroidManifest.xml:43:13-45:29
+119                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
+119-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\socce\.gradle\caches\9.0-milestone-1\transforms\09451cc41b0458bc3ec50756d3d7df69\transformed\profileinstaller-1.3.1\AndroidManifest.xml:44:17-85
+119-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\socce\.gradle\caches\9.0-milestone-1\transforms\09451cc41b0458bc3ec50756d3d7df69\transformed\profileinstaller-1.3.1\AndroidManifest.xml:44:25-82
+120            </intent-filter>
+121            <intent-filter>
+121-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\socce\.gradle\caches\9.0-milestone-1\transforms\09451cc41b0458bc3ec50756d3d7df69\transformed\profileinstaller-1.3.1\AndroidManifest.xml:46:13-48:29
+122                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
+122-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\socce\.gradle\caches\9.0-milestone-1\transforms\09451cc41b0458bc3ec50756d3d7df69\transformed\profileinstaller-1.3.1\AndroidManifest.xml:47:17-88
+122-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\socce\.gradle\caches\9.0-milestone-1\transforms\09451cc41b0458bc3ec50756d3d7df69\transformed\profileinstaller-1.3.1\AndroidManifest.xml:47:25-85
+123            </intent-filter>
+124            <intent-filter>
+124-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\socce\.gradle\caches\9.0-milestone-1\transforms\09451cc41b0458bc3ec50756d3d7df69\transformed\profileinstaller-1.3.1\AndroidManifest.xml:49:13-51:29
+125                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
+125-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\socce\.gradle\caches\9.0-milestone-1\transforms\09451cc41b0458bc3ec50756d3d7df69\transformed\profileinstaller-1.3.1\AndroidManifest.xml:50:17-95
+125-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\socce\.gradle\caches\9.0-milestone-1\transforms\09451cc41b0458bc3ec50756d3d7df69\transformed\profileinstaller-1.3.1\AndroidManifest.xml:50:25-92
+126            </intent-filter>
+127        </receiver>
+128    </application>
+129
+130</manifest>

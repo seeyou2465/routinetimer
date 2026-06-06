@@ -1,0 +1,6 @@
+R_DEF: Internal format may change without notice
+local
+drawable ic_alarm
+font mplus_rounded
+string app_name
+style Theme.RoutineAlarm
