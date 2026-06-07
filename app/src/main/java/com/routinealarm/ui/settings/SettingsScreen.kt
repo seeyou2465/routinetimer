@@ -106,6 +106,8 @@ fun SettingsScreen(viewModel: SettingsViewModel = hiltViewModel()) {
 @Composable
 private fun OperationSubScreen(viewModel: SettingsViewModel) {
     val delayMinutes by viewModel.todayDelayMinutes.collectAsState()
+    val alarmSoundEnabled by viewModel.alarmSoundEnabled.collectAsState()
+    val vibrationEnabled by viewModel.vibrationEnabled.collectAsState()
     var input by remember(delayMinutes) { mutableStateOf(delayMinutes.toString()) }
     val parsedMinutes = input.toIntOrNull()
     val isValid = parsedMinutes != null && parsedMinutes in 1..120
@@ -115,6 +117,45 @@ private fun OperationSubScreen(viewModel: SettingsViewModel) {
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
+        item {
+            Card(
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Text(
+                        "発火時の動作",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Text(
+                        "アラーム発火時、またはタイマー完了時の通知方法を設定します。",
+                        fontSize = 13.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    AlertSettingRow(
+                        title = "アラーム音",
+                        description = "端末の標準アラーム音を鳴らします。",
+                        checked = alarmSoundEnabled,
+                        onCheckedChange = viewModel::updateAlarmSoundEnabled
+                    )
+                    HorizontalDivider()
+                    AlertSettingRow(
+                        title = "バイブレーション",
+                        description = "音と併用、または単体で振動します。",
+                        checked = vibrationEnabled,
+                        onCheckedChange = viewModel::updateVibrationEnabled
+                    )
+                }
+            }
+        }
+
         item {
             Card(
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
@@ -169,6 +210,37 @@ private fun OperationSubScreen(viewModel: SettingsViewModel) {
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun AlertSettingRow(
+    title: String,
+    description: String,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                title,
+                fontSize = 15.sp,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Text(
+                description,
+                fontSize = 12.sp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+        Switch(
+            checked = checked,
+            onCheckedChange = onCheckedChange
+        )
     }
 }
 

@@ -38,6 +38,20 @@ class SettingsViewModel @Inject constructor(
             settingsRepo.getTodayDelayMinutes()
         )
 
+    val alarmSoundEnabled: StateFlow<Boolean> = settingsRepo.alarmSoundEnabledFlow()
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            settingsRepo.isAlarmSoundEnabled()
+        )
+
+    val vibrationEnabled: StateFlow<Boolean> = settingsRepo.vibrationEnabledFlow()
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            settingsRepo.isVibrationEnabled()
+        )
+
     fun addRoutine(hour: Int, minute: Int, eventName: String, alarmType: String, timerMinutes: Int) {
         viewModelScope.launch { routineRepo.add(hour, minute, eventName, alarmType, timerMinutes) }
     }
@@ -69,6 +83,14 @@ class SettingsViewModel @Inject constructor(
 
     fun updateTodayDelayMinutes(minutes: Int) {
         settingsRepo.setTodayDelayMinutes(minutes)
+    }
+
+    fun updateAlarmSoundEnabled(enabled: Boolean) {
+        settingsRepo.setAlarmSoundEnabled(enabled)
+    }
+
+    fun updateVibrationEnabled(enabled: Boolean) {
+        settingsRepo.setVibrationEnabled(enabled)
     }
 
     fun copyRoutineToDays(dayOfWeeks: Set<Int>) {

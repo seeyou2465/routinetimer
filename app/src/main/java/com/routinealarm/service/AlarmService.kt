@@ -14,6 +14,7 @@ import com.routinealarm.R
 import com.routinealarm.data.db.ALARM_TYPE_ALARM
 import com.routinealarm.data.db.ALARM_TYPE_TIMER
 import com.routinealarm.data.db.DEFAULT_TIMER_MINUTES
+import com.routinealarm.data.repository.AlarmSettingsRepository
 import com.routinealarm.ui.alarm.AlarmActivity
 
 class AlarmService : Service() {
@@ -31,8 +32,7 @@ class AlarmService : Service() {
             stopAlarmSound()
             return START_NOT_STICKY
         } else if (action == AlarmActivity.ACTION_RESTART_SOUND) {
-            startRingtone()
-            startVibration()
+            startConfiguredAlerts()
             return START_NOT_STICKY
         }
 
@@ -67,9 +67,8 @@ class AlarmService : Service() {
             Log.d("AlarmDebug", "AlarmService: Timer mode. Skipping ringtone and vibration.")
             stopAlarmSound()
         } else {
-            Log.d("AlarmDebug", "AlarmService: Starting ringtone and vibration...")
-            startRingtone()
-            startVibration()
+            Log.d("AlarmDebug", "AlarmService: Starting configured alerts...")
+            startConfiguredAlerts()
         }
 
         Log.d("AlarmDebug", "AlarmService: Starting AlarmActivity...")
@@ -92,6 +91,12 @@ class AlarmService : Service() {
             val uri: Uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
                 ?: RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE)
             ringtone = RingtoneManager.getRingtone(this, uri)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                ringtone?.audioAttributes = AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_ALARM)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                    .build()
+            }
             ringtone?.isLooping = true
             ringtone?.play()
             Log.d("AlarmDebug", "AlarmService: Ringtone playing")
@@ -99,6 +104,34 @@ class AlarmService : Service() {
             Log.e("AlarmDebug", "AlarmService: Failed to play ringtone", e)
         }
     }
+
+    private fun startConfiguredAlerts() {
+        stopAlarmSound()
+        if (isAlarmSoundEnabled()) {
+            startRingtone()
+        } else {
+            Log.d("AlarmDebug", "AlarmService: Alarm sound disabled by settings.")
+        }
+        if (isVibrationEnabled()) {
+            startVibration()
+        } else {
+            Log.d("AlarmDebug", "AlarmService: Vibration disabled by settings.")
+        }
+    }
+
+    private fun isAlarmSoundEnabled(): Boolean =
+        getSharedPreferences(AlarmSettingsRepository.PREFS_NAME, Context.MODE_PRIVATE)
+            .getBoolean(
+                AlarmSettingsRepository.KEY_ALARM_SOUND_ENABLED,
+                AlarmSettingsRepository.DEFAULT_ALARM_SOUND_ENABLED
+            )
+
+    private fun isVibrationEnabled(): Boolean =
+        getSharedPreferences(AlarmSettingsRepository.PREFS_NAME, Context.MODE_PRIVATE)
+            .getBoolean(
+                AlarmSettingsRepository.KEY_VIBRATION_ENABLED,
+                AlarmSettingsRepository.DEFAULT_VIBRATION_ENABLED
+            )
 
     private fun startVibration() {
         vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
