@@ -2,6 +2,7 @@ package com.routinealarm.data.db
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import androidx.room.ColumnInfo
 
 @Entity(tableName = "routine_entries")
 data class RoutineEntryEntity(
@@ -31,5 +32,7 @@ data class TodayAlarmEntity(
     val minute: Int,
     val eventName: String,
     val isEnabled: Boolean,
-    val isTodayOnly: Boolean   // 本日限定フラグ
+    val isTodayOnly: Boolean,  // 本日限定フラグ
+    @ColumnInfo(defaultValue = "-1") val originalHour: Int = -1,
+    @ColumnInfo(defaultValue = "-1") val originalMinute: Int = -1
 )

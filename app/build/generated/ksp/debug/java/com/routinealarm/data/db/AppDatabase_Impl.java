@@ -35,14 +35,14 @@ public final class AppDatabase_Impl extends AppDatabase {
   @Override
   @NonNull
   protected SupportSQLiteOpenHelper createOpenHelper(@NonNull final DatabaseConfiguration config) {
-    final SupportSQLiteOpenHelper.Callback _openCallback = new RoomOpenHelper(config, new RoomOpenHelper.Delegate(1) {
+    final SupportSQLiteOpenHelper.Callback _openCallback = new RoomOpenHelper(config, new RoomOpenHelper.Delegate(2) {
       @Override
       public void createAllTables(@NonNull final SupportSQLiteDatabase db) {
         db.execSQL("CREATE TABLE IF NOT EXISTS `routine_entries` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `hour` INTEGER NOT NULL, `minute` INTEGER NOT NULL, `eventName` TEXT NOT NULL, `sortOrder` INTEGER NOT NULL)");
         db.execSQL("CREATE TABLE IF NOT EXISTS `weekly_alarms` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `dayOfWeek` INTEGER NOT NULL, `hour` INTEGER NOT NULL, `minute` INTEGER NOT NULL, `eventName` TEXT NOT NULL, `isEnabled` INTEGER NOT NULL, `isFromRoutine` INTEGER NOT NULL)");
-        db.execSQL("CREATE TABLE IF NOT EXISTS `today_alarms` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `date` TEXT NOT NULL, `hour` INTEGER NOT NULL, `minute` INTEGER NOT NULL, `eventName` TEXT NOT NULL, `isEnabled` INTEGER NOT NULL, `isTodayOnly` INTEGER NOT NULL)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS `today_alarms` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `date` TEXT NOT NULL, `hour` INTEGER NOT NULL, `minute` INTEGER NOT NULL, `eventName` TEXT NOT NULL, `isEnabled` INTEGER NOT NULL, `isTodayOnly` INTEGER NOT NULL, `originalHour` INTEGER NOT NULL DEFAULT -1, `originalMinute` INTEGER NOT NULL DEFAULT -1)");
         db.execSQL("CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)");
-        db.execSQL("INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '02d133709c4bfb833ad928c367ad773c')");
+        db.execSQL("INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'a4997c94fb12d51ce9450f3df873c2ba')");
       }
 
       @Override
@@ -125,7 +125,7 @@ public final class AppDatabase_Impl extends AppDatabase {
                   + " Expected:\n" + _infoWeeklyAlarms + "\n"
                   + " Found:\n" + _existingWeeklyAlarms);
         }
-        final HashMap<String, TableInfo.Column> _columnsTodayAlarms = new HashMap<String, TableInfo.Column>(7);
+        final HashMap<String, TableInfo.Column> _columnsTodayAlarms = new HashMap<String, TableInfo.Column>(9);
         _columnsTodayAlarms.put("id", new TableInfo.Column("id", "INTEGER", true, 1, null, TableInfo.CREATED_FROM_ENTITY));
         _columnsTodayAlarms.put("date", new TableInfo.Column("date", "TEXT", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
         _columnsTodayAlarms.put("hour", new TableInfo.Column("hour", "INTEGER", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
@@ -133,6 +133,8 @@ public final class AppDatabase_Impl extends AppDatabase {
         _columnsTodayAlarms.put("eventName", new TableInfo.Column("eventName", "TEXT", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
         _columnsTodayAlarms.put("isEnabled", new TableInfo.Column("isEnabled", "INTEGER", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
         _columnsTodayAlarms.put("isTodayOnly", new TableInfo.Column("isTodayOnly", "INTEGER", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsTodayAlarms.put("originalHour", new TableInfo.Column("originalHour", "INTEGER", true, 0, "-1", TableInfo.CREATED_FROM_ENTITY));
+        _columnsTodayAlarms.put("originalMinute", new TableInfo.Column("originalMinute", "INTEGER", true, 0, "-1", TableInfo.CREATED_FROM_ENTITY));
         final HashSet<TableInfo.ForeignKey> _foreignKeysTodayAlarms = new HashSet<TableInfo.ForeignKey>(0);
         final HashSet<TableInfo.Index> _indicesTodayAlarms = new HashSet<TableInfo.Index>(0);
         final TableInfo _infoTodayAlarms = new TableInfo("today_alarms", _columnsTodayAlarms, _foreignKeysTodayAlarms, _indicesTodayAlarms);
@@ -144,7 +146,7 @@ public final class AppDatabase_Impl extends AppDatabase {
         }
         return new RoomOpenHelper.ValidationResult(true, null);
       }
-    }, "02d133709c4bfb833ad928c367ad773c", "92af4c0b9e850bfe2bd7b8c73cfc4286");
+    }, "a4997c94fb12d51ce9450f3df873c2ba", "cdbeab452c25c81c20ff1a32ee633d98");
     final SupportSQLiteOpenHelper.Configuration _sqliteConfig = SupportSQLiteOpenHelper.Configuration.builder(config.context).name(config.name).callback(_openCallback).build();
     final SupportSQLiteOpenHelper _helper = config.sqliteOpenHelperFactory.create(_sqliteConfig);
     return _helper;

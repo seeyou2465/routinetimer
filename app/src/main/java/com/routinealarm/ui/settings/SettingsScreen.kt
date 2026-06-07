@@ -27,14 +27,14 @@ private val DAY_LABELS = listOf("日", "月", "火", "水", "木", "金", "土")
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun SettingsScreen(viewModel: SettingsViewModel = hiltViewModel()) {
-    val pagerState = androidx.compose.foundation.pager.rememberPagerState(pageCount = { 2 })
+    val pagerState = androidx.compose.foundation.pager.rememberPagerState(pageCount = { 3 })
     val coroutineScope = rememberCoroutineScope()
 
     Column(modifier = Modifier.fillMaxSize()) {
         Surface(
             modifier = Modifier.tabLabelSwipe(
                 pagerState = pagerState,
-                pageCount = 2,
+                pageCount = 3,
                 coroutineScope = coroutineScope
             ),
             color = MaterialTheme.colorScheme.surface,
@@ -72,6 +72,19 @@ fun SettingsScreen(viewModel: SettingsViewModel = hiltViewModel()) {
                         )
                     }
                 )
+                Tab(
+                    selected = pagerState.currentPage == 2,
+                    onClick = { coroutineScope.launch { pagerState.animateScrollToPage(2) } },
+                    selectedContentColor = MaterialTheme.colorScheme.primary,
+                    unselectedContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    text = {
+                        Text(
+                            "操作",
+                            fontSize = 16.sp,
+                            fontWeight = if (pagerState.currentPage == 2) FontWeight.Bold else FontWeight.Medium
+                        )
+                    }
+                )
             }
         }
 
@@ -83,9 +96,79 @@ fun SettingsScreen(viewModel: SettingsViewModel = hiltViewModel()) {
                 when (page) {
                     0 -> RoutineSubScreen(viewModel)
                     1 -> PermissionSubScreen(viewModel)
+                    2 -> OperationSubScreen(viewModel)
                 }
             }
         )
+    }
+}
+
+@Composable
+private fun OperationSubScreen(viewModel: SettingsViewModel) {
+    val delayMinutes by viewModel.todayDelayMinutes.collectAsState()
+    var input by remember(delayMinutes) { mutableStateOf(delayMinutes.toString()) }
+    val parsedMinutes = input.toIntOrNull()
+    val isValid = parsedMinutes != null && parsedMinutes in 1..120
+
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        item {
+            Card(
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Text(
+                        "本日アラームの右スワイプ",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Text(
+                        "右スワイプしたときに、本日限りで設定時間を延長する分数です。",
+                        fontSize = 13.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    OutlinedTextField(
+                        value = input,
+                        onValueChange = { value ->
+                            if (value.length <= 3 && value.all { it.isDigit() }) {
+                                input = value
+                            }
+                        },
+                        label = { Text("延長分数") },
+                        suffix = { Text("分") },
+                        isError = input.isNotBlank() && !isValid,
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    if (input.isNotBlank() && !isValid) {
+                        Text(
+                            "1〜120分で入力してください。",
+                            fontSize = 12.sp,
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    }
+                    Button(
+                        onClick = {
+                            parsedMinutes?.let(viewModel::updateTodayDelayMinutes)
+                        },
+                        enabled = isValid && parsedMinutes != delayMinutes,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("保存")
+                    }
+                }
+            }
+        }
     }
 }
 

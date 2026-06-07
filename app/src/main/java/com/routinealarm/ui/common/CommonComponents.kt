@@ -43,8 +43,10 @@ private fun alarmNameFontSize(name: String): TextUnit = when {
 @Composable
 fun AlarmCardToday(
     alarm: TodayAlarmEntity,
+    delayMinutes: Int,
     onToggle: () -> Unit,
     onDelete: () -> Unit,
+    onDelay: () -> Unit,
     onEdit: () -> Unit
 ) {
     val density = LocalDensity.current
@@ -52,8 +54,10 @@ fun AlarmCardToday(
     val maxSwipeOffset = with(density) { 128.dp.toPx() }
     var swipeOffset by remember(alarm.id) { mutableFloatStateOf(0f) }
     val swipeProgress = (-swipeOffset / swipeThreshold).coerceIn(0f, 1f)
+    val delaySwipeProgress = (swipeOffset / swipeThreshold).coerceIn(0f, 1f)
     val currentOnToggle by rememberUpdatedState(onToggle)
     val currentOnDelete by rememberUpdatedState(onDelete)
+    val currentOnDelay by rememberUpdatedState(onDelay)
     val currentOnEdit by rememberUpdatedState(onEdit)
 
     LaunchedEffect(alarm.isEnabled) {
@@ -61,28 +65,44 @@ fun AlarmCardToday(
     }
 
     Box(modifier = Modifier.fillMaxWidth()) {
-        val actionColor = when {
+        val leftActionColor = when {
             alarm.isTodayOnly -> MaterialTheme.colorScheme.error
             alarm.isEnabled -> Color(0xFFE64A19)
             else -> Color(0xFF388E3C)
         }
-        val actionText = when {
+        val leftActionText = when {
             alarm.isTodayOnly -> "削除  "
             alarm.isEnabled -> "無効にする  "
             else -> "有効にする  "
+        }
+        val rightActionColor = MaterialTheme.colorScheme.primary
+
+        Box(
+            modifier = Modifier
+                .matchParentSize()
+                .background(leftActionColor.copy(alpha = 0.12f * swipeProgress)),
+            contentAlignment = Alignment.CenterEnd
+        ) {
+            Text(
+                text = leftActionText,
+                color = leftActionColor.copy(alpha = swipeProgress),
+                modifier = Modifier.padding(end = 16.dp),
+                fontSize = 14.sp
+            )
         }
 
         Box(
             modifier = Modifier
                 .matchParentSize()
-                .background(actionColor.copy(alpha = 0.12f * swipeProgress)),
-            contentAlignment = Alignment.CenterEnd
+                .background(rightActionColor.copy(alpha = 0.14f * delaySwipeProgress)),
+            contentAlignment = Alignment.CenterStart
         ) {
             Text(
-                text = actionText,
-                color = actionColor.copy(alpha = swipeProgress),
-                modifier = Modifier.padding(end = 16.dp),
-                fontSize = 14.sp
+                text = "+${delayMinutes}分  ",
+                color = rightActionColor.copy(alpha = delaySwipeProgress),
+                modifier = Modifier.padding(start = 16.dp),
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold
             )
         }
 
@@ -123,7 +143,7 @@ fun AlarmCardToday(
                             if (isHorizontalDrag) {
                                 change.consume()
                                 swipeOffset = (swipeOffset + dragAmount.x)
-                                    .coerceIn(-maxSwipeOffset, 0f)
+                                    .coerceIn(-maxSwipeOffset, maxSwipeOffset)
                             }
                         }
 
@@ -133,6 +153,8 @@ fun AlarmCardToday(
                             } else {
                                 currentOnToggle()
                             }
+                        } else if (swipeOffset >= swipeThreshold && alarm.isEnabled) {
+                            currentOnDelay()
                         }
                         swipeOffset = 0f
                     }

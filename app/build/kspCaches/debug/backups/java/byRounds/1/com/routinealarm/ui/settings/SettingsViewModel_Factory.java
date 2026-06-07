@@ -1,6 +1,7 @@
 package com.routinealarm.ui.settings;
 
 import android.content.Context;
+import com.routinealarm.data.repository.AlarmSettingsRepository;
 import com.routinealarm.data.repository.RoutineRepository;
 import com.routinealarm.data.repository.WeeklyAlarmRepository;
 import dagger.internal.DaggerGenerated;
@@ -31,27 +32,32 @@ public final class SettingsViewModel_Factory implements Factory<SettingsViewMode
 
   private final Provider<WeeklyAlarmRepository> weeklyRepoProvider;
 
+  private final Provider<AlarmSettingsRepository> settingsRepoProvider;
+
   public SettingsViewModel_Factory(Provider<Context> contextProvider,
       Provider<RoutineRepository> routineRepoProvider,
-      Provider<WeeklyAlarmRepository> weeklyRepoProvider) {
+      Provider<WeeklyAlarmRepository> weeklyRepoProvider,
+      Provider<AlarmSettingsRepository> settingsRepoProvider) {
     this.contextProvider = contextProvider;
     this.routineRepoProvider = routineRepoProvider;
     this.weeklyRepoProvider = weeklyRepoProvider;
+    this.settingsRepoProvider = settingsRepoProvider;
   }
 
   @Override
   public SettingsViewModel get() {
-    return newInstance(contextProvider.get(), routineRepoProvider.get(), weeklyRepoProvider.get());
+    return newInstance(contextProvider.get(), routineRepoProvider.get(), weeklyRepoProvider.get(), settingsRepoProvider.get());
   }
 
   public static SettingsViewModel_Factory create(Provider<Context> contextProvider,
       Provider<RoutineRepository> routineRepoProvider,
-      Provider<WeeklyAlarmRepository> weeklyRepoProvider) {
-    return new SettingsViewModel_Factory(contextProvider, routineRepoProvider, weeklyRepoProvider);
+      Provider<WeeklyAlarmRepository> weeklyRepoProvider,
+      Provider<AlarmSettingsRepository> settingsRepoProvider) {
+    return new SettingsViewModel_Factory(contextProvider, routineRepoProvider, weeklyRepoProvider, settingsRepoProvider);
   }
 
   public static SettingsViewModel newInstance(Context context, RoutineRepository routineRepo,
-      WeeklyAlarmRepository weeklyRepo) {
-    return new SettingsViewModel(context, routineRepo, weeklyRepo);
+      WeeklyAlarmRepository weeklyRepo, AlarmSettingsRepository settingsRepo) {
+    return new SettingsViewModel(context, routineRepo, weeklyRepo, settingsRepo);
   }
 }

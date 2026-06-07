@@ -11,6 +11,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.routinealarm.data.db.RoutineEntryEntity
+import com.routinealarm.data.repository.AlarmSettingsRepository
 import com.routinealarm.data.repository.RoutineRepository
 import com.routinealarm.data.repository.WeeklyAlarmRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,11 +24,19 @@ import javax.inject.Inject
 class SettingsViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val routineRepo: RoutineRepository,
-    private val weeklyRepo: WeeklyAlarmRepository
+    private val weeklyRepo: WeeklyAlarmRepository,
+    private val settingsRepo: AlarmSettingsRepository
 ) : ViewModel() {
 
     val routines: StateFlow<List<RoutineEntryEntity>> = routineRepo.getAll()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    val todayDelayMinutes: StateFlow<Int> = settingsRepo.todayDelayMinutesFlow()
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            settingsRepo.getTodayDelayMinutes()
+        )
 
     fun addRoutine(hour: Int, minute: Int, eventName: String) {
         viewModelScope.launch { routineRepo.add(hour, minute, eventName) }
@@ -39,6 +48,10 @@ class SettingsViewModel @Inject constructor(
 
     fun deleteRoutine(entry: RoutineEntryEntity) {
         viewModelScope.launch { routineRepo.delete(entry) }
+    }
+
+    fun updateTodayDelayMinutes(minutes: Int) {
+        settingsRepo.setTodayDelayMinutes(minutes)
     }
 
     fun copyRoutineToDay(dayOfWeek: Int) {

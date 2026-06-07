@@ -10,6 +10,7 @@ import com.routinealarm.data.db.AppDatabase;
 import com.routinealarm.data.db.RoutineEntryDao;
 import com.routinealarm.data.db.TodayAlarmDao;
 import com.routinealarm.data.db.WeeklyAlarmDao;
+import com.routinealarm.data.repository.AlarmSettingsRepository;
 import com.routinealarm.data.repository.RoutineRepository;
 import com.routinealarm.data.repository.TodayAlarmRepository;
 import com.routinealarm.data.repository.WeeklyAlarmRepository;
@@ -420,25 +421,25 @@ public final class DaggerRoutineAlarmApp_HiltComponents_SingletonC {
 
     @IdentifierNameString
     private static final class LazyClassKeyProvider {
-      static String com_routinealarm_ui_alarm_AlarmViewModel = "com.routinealarm.ui.alarm.AlarmViewModel";
-
-      static String com_routinealarm_ui_week_WeekViewModel = "com.routinealarm.ui.week.WeekViewModel";
-
       static String com_routinealarm_ui_settings_SettingsViewModel = "com.routinealarm.ui.settings.SettingsViewModel";
 
       static String com_routinealarm_ui_today_TodayViewModel = "com.routinealarm.ui.today.TodayViewModel";
 
-      @KeepFieldType
-      AlarmViewModel com_routinealarm_ui_alarm_AlarmViewModel2;
+      static String com_routinealarm_ui_alarm_AlarmViewModel = "com.routinealarm.ui.alarm.AlarmViewModel";
 
-      @KeepFieldType
-      WeekViewModel com_routinealarm_ui_week_WeekViewModel2;
+      static String com_routinealarm_ui_week_WeekViewModel = "com.routinealarm.ui.week.WeekViewModel";
 
       @KeepFieldType
       SettingsViewModel com_routinealarm_ui_settings_SettingsViewModel2;
 
       @KeepFieldType
       TodayViewModel com_routinealarm_ui_today_TodayViewModel2;
+
+      @KeepFieldType
+      AlarmViewModel com_routinealarm_ui_alarm_AlarmViewModel2;
+
+      @KeepFieldType
+      WeekViewModel com_routinealarm_ui_week_WeekViewModel2;
     }
   }
 
@@ -534,10 +535,10 @@ public final class DaggerRoutineAlarmApp_HiltComponents_SingletonC {
           return (T) new AlarmViewModel();
 
           case 1: // com.routinealarm.ui.settings.SettingsViewModel 
-          return (T) new SettingsViewModel(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule), singletonCImpl.routineRepositoryProvider.get(), singletonCImpl.weeklyAlarmRepositoryProvider.get());
+          return (T) new SettingsViewModel(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule), singletonCImpl.routineRepositoryProvider.get(), singletonCImpl.weeklyAlarmRepositoryProvider.get(), singletonCImpl.alarmSettingsRepositoryProvider.get());
 
           case 2: // com.routinealarm.ui.today.TodayViewModel 
-          return (T) new TodayViewModel(singletonCImpl.todayAlarmRepositoryProvider.get(), singletonCImpl.weeklyAlarmRepositoryProvider.get(), singletonCImpl.alarmSchedulerProvider.get());
+          return (T) new TodayViewModel(singletonCImpl.todayAlarmRepositoryProvider.get(), singletonCImpl.weeklyAlarmRepositoryProvider.get(), singletonCImpl.alarmSettingsRepositoryProvider.get(), singletonCImpl.alarmSchedulerProvider.get());
 
           case 3: // com.routinealarm.ui.week.WeekViewModel 
           return (T) new WeekViewModel(singletonCImpl.weeklyAlarmRepositoryProvider.get(), singletonCImpl.alarmSchedulerProvider.get());
@@ -632,6 +633,8 @@ public final class DaggerRoutineAlarmApp_HiltComponents_SingletonC {
 
     private Provider<RoutineRepository> routineRepositoryProvider;
 
+    private Provider<AlarmSettingsRepository> alarmSettingsRepositoryProvider;
+
     private SingletonCImpl(ApplicationContextModule applicationContextModuleParam) {
       this.applicationContextModule = applicationContextModuleParam;
       initialize(applicationContextModuleParam);
@@ -657,6 +660,7 @@ public final class DaggerRoutineAlarmApp_HiltComponents_SingletonC {
       this.weeklyAlarmRepositoryProvider = DoubleCheck.provider(new SwitchingProvider<WeeklyAlarmRepository>(singletonCImpl, 2));
       this.alarmSchedulerProvider = DoubleCheck.provider(new SwitchingProvider<AlarmScheduler>(singletonCImpl, 3));
       this.routineRepositoryProvider = DoubleCheck.provider(new SwitchingProvider<RoutineRepository>(singletonCImpl, 4));
+      this.alarmSettingsRepositoryProvider = DoubleCheck.provider(new SwitchingProvider<AlarmSettingsRepository>(singletonCImpl, 5));
     }
 
     @Override
@@ -718,6 +722,9 @@ public final class DaggerRoutineAlarmApp_HiltComponents_SingletonC {
 
           case 4: // com.routinealarm.data.repository.RoutineRepository 
           return (T) new RoutineRepository(singletonCImpl.routineEntryDao());
+
+          case 5: // com.routinealarm.data.repository.AlarmSettingsRepository 
+          return (T) new AlarmSettingsRepository(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule));
 
           default: throw new AssertionError(id);
         }

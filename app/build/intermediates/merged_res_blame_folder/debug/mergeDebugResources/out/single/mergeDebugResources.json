@@ -1,5 +1,9 @@
 [
     {
+        "merged": "com.routinealarm.app-debug-59:/drawable_ic_launcher_alarm.xml.flat",
+        "source": "com.routinealarm.app-main-61:/drawable/ic_launcher_alarm.xml"
+    },
+    {
         "merged": "com.routinealarm.app-debug-59:/font_mplus_rounded.ttf.flat",
         "source": "com.routinealarm.app-main-61:/font/mplus_rounded.ttf"
     },

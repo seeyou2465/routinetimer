@@ -26,6 +26,7 @@ import java.util.Locale
 fun TodayScreen(viewModel: TodayViewModel = hiltViewModel()) {
     val alarms by viewModel.alarms.collectAsState()
     val today by viewModel.today.collectAsState()
+    val delayMinutes by viewModel.delayMinutes.collectAsState()
     var showAddDialog by remember { mutableStateOf(false) }
     var editTarget by remember { mutableStateOf<TodayAlarmEntity?>(null) }
     var deleteTarget by remember { mutableStateOf<TodayAlarmEntity?>(null) }
@@ -74,8 +75,10 @@ fun TodayScreen(viewModel: TodayViewModel = hiltViewModel()) {
                 items(alarms, key = { it.id }) { alarm ->
                     AlarmCardToday(
                         alarm = alarm,
+                        delayMinutes = delayMinutes,
                         onToggle = { viewModel.toggleEnabled(alarm) },
                         onDelete = { deleteTarget = alarm },
+                        onDelay = { viewModel.delayTodayAlarm(alarm) },
                         onEdit = { editTarget = alarm }
                     )
                 }

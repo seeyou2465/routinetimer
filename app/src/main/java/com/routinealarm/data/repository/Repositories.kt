@@ -70,7 +70,8 @@ class TodayAlarmRepository @Inject constructor(
     ): Long = dao.insert(
         TodayAlarmEntity(
             date = date, hour = hour, minute = minute,
-            eventName = eventName, isEnabled = true, isTodayOnly = isTodayOnly
+            eventName = eventName, isEnabled = true, isTodayOnly = isTodayOnly,
+            originalHour = hour, originalMinute = minute
         )
     )
 

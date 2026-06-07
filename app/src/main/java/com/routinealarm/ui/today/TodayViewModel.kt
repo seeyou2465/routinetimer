@@ -4,10 +4,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.routinealarm.data.db.TodayAlarmEntity
 import com.routinealarm.data.db.WeeklyAlarmEntity
+import com.routinealarm.data.repository.AlarmSettingsRepository
 import com.routinealarm.data.repository.TodayAlarmRepository
 import com.routinealarm.data.repository.WeeklyAlarmRepository
 import com.routinealarm.service.AlarmScheduler
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -16,9 +18,11 @@ import javax.inject.Inject
 import android.util.Log
 
 @HiltViewModel
+@OptIn(ExperimentalCoroutinesApi::class)
 class TodayViewModel @Inject constructor(
     private val todayRepo: TodayAlarmRepository,
     private val weeklyRepo: WeeklyAlarmRepository,
+    private val settingsRepo: AlarmSettingsRepository,
     private val scheduler: AlarmScheduler
 ) : ViewModel() {
 
@@ -29,6 +33,13 @@ class TodayViewModel @Inject constructor(
         .flatMapLatest { todayRepo.getByDate(it.toString()) }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
+    val delayMinutes: StateFlow<Int> = settingsRepo.todayDelayMinutesFlow()
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            settingsRepo.getTodayDelayMinutes()
+        )
+
     /** 日付変更処理（手動更新ボタンでも呼べる） */
     fun refresh() {
         viewModelScope.launch {
@@ -38,6 +49,22 @@ class TodayViewModel @Inject constructor(
 
             // 古い非「本日のみ」アラームを削除
             todayRepo.deleteOldNonTodayOnly(dateStr)
+
+            todayRepo.getByDateOnce(dateStr).forEach { alarm ->
+                if (alarm.isTodayOnly) {
+                    val restored = alarm.restoredToOriginalTime()
+                    if (restored != alarm) {
+                        todayRepo.update(restored)
+                    }
+                    if (restored.isEnabled) {
+                        scheduler.cancel(restored.id)
+                        scheduleIfFuture(restored.id, date, restored.hour, restored.minute, restored.eventName)
+                    }
+                } else {
+                    scheduler.cancel(alarm.id)
+                }
+            }
+
             // 本日の非「本日のみ」アラームを再生成
             todayRepo.deleteTodayNonOnlyByDate(dateStr)
 
@@ -55,14 +82,41 @@ class TodayViewModel @Inject constructor(
 
     fun toggleEnabled(alarm: TodayAlarmEntity) {
         viewModelScope.launch {
-            val updated = alarm.copy(isEnabled = !alarm.isEnabled)
+            val updated = if (alarm.isEnabled) {
+                alarm.restoredToOriginalTime().copy(isEnabled = false)
+            } else {
+                alarm.restoredToOriginalTime().copy(isEnabled = true)
+            }
             todayRepo.update(updated)
             if (updated.isEnabled) {
-                val date = LocalDate.parse(alarm.date)
-                scheduleIfFuture(alarm.id, date, alarm.hour, alarm.minute, alarm.eventName)
+                val date = LocalDate.parse(updated.date)
+                scheduleIfFuture(updated.id, date, updated.hour, updated.minute, updated.eventName)
             } else {
-                scheduler.cancel(alarm.id)
+                scheduler.cancel(updated.id)
             }
+        }
+    }
+
+    fun delayTodayAlarm(alarm: TodayAlarmEntity) {
+        if (!alarm.isEnabled) return
+
+        viewModelScope.launch {
+            val delayMinutes = settingsRepo.getTodayDelayMinutes()
+            val baseHour = alarm.normalizedOriginalHour()
+            val baseMinute = alarm.normalizedOriginalMinute()
+            val delayedTotalMinutes = (alarm.hour * 60 + alarm.minute + delayMinutes)
+                .coerceAtMost(23 * 60 + 59)
+            val updated = alarm.copy(
+                hour = delayedTotalMinutes / 60,
+                minute = delayedTotalMinutes % 60,
+                originalHour = baseHour,
+                originalMinute = baseMinute,
+                isEnabled = true
+            )
+            todayRepo.update(updated)
+            val date = LocalDate.parse(updated.date)
+            scheduler.cancel(updated.id)
+            scheduleIfFuture(updated.id, date, updated.hour, updated.minute, updated.eventName)
         }
     }
 
@@ -83,7 +137,14 @@ class TodayViewModel @Inject constructor(
 
     fun updateAlarm(alarm: TodayAlarmEntity, hour: Int, minute: Int, eventName: String) {
         viewModelScope.launch {
-            val updated = alarm.copy(hour = hour, minute = minute, eventName = eventName, isEnabled = true)
+            val updated = alarm.copy(
+                hour = hour,
+                minute = minute,
+                eventName = eventName,
+                isEnabled = true,
+                originalHour = hour,
+                originalMinute = minute
+            )
             todayRepo.update(updated)
             val date = LocalDate.parse(updated.date)
             scheduleIfFuture(updated.id, date, updated.hour, updated.minute, updated.eventName)
@@ -108,4 +169,13 @@ class TodayViewModel @Inject constructor(
         Log.d("AlarmDebug", "TodayViewModel: scheduleIfFuture -> Scheduling for $millis (in ${millis - now} ms).")
         scheduler.schedule(id, millis, eventName)
     }
+
+    private fun TodayAlarmEntity.normalizedOriginalHour(): Int =
+        originalHour.takeIf { it in 0..23 } ?: hour
+
+    private fun TodayAlarmEntity.normalizedOriginalMinute(): Int =
+        originalMinute.takeIf { it in 0..59 } ?: minute
+
+    private fun TodayAlarmEntity.restoredToOriginalTime(): TodayAlarmEntity =
+        copy(hour = normalizedOriginalHour(), minute = normalizedOriginalMinute())
 }

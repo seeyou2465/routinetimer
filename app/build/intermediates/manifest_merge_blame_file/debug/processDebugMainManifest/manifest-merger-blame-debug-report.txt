@@ -67,12 +67,12 @@
 34-->[androidx.core:core:1.13.1] C:\Users\socce\.gradle\caches\9.0-milestone-1\transforms\68c3625ebd199b5553e33d32af0f04f6\transformed\core-1.13.1\AndroidManifest.xml:28:18-86
 35        android:debuggable="true"
 36        android:extractNativeLibs="false"
-37        android:icon="@drawable/ic_alarm"
-37-->C:\Users\socce\Documents\開発\ルーティンアラーム\app\src\main\AndroidManifest.xml:21:9-42
+37        android:icon="@drawable/ic_launcher_alarm"
+37-->C:\Users\socce\Documents\開発\ルーティンアラーム\app\src\main\AndroidManifest.xml:21:9-51
 38        android:label="@string/app_name"
 38-->C:\Users\socce\Documents\開発\ルーティンアラーム\app\src\main\AndroidManifest.xml:22:9-41
-39        android:roundIcon="@drawable/ic_alarm"
-39-->C:\Users\socce\Documents\開発\ルーティンアラーム\app\src\main\AndroidManifest.xml:23:9-47
+39        android:roundIcon="@drawable/ic_launcher_alarm"
+39-->C:\Users\socce\Documents\開発\ルーティンアラーム\app\src\main\AndroidManifest.xml:23:9-56
 40        android:supportsRtl="true"
 40-->C:\Users\socce\Documents\開発\ルーティンアラーム\app\src\main\AndroidManifest.xml:24:9-35
 41        android:testOnly="true"
