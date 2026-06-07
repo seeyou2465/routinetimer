@@ -16,12 +16,20 @@ class AlarmScheduler @Inject constructor(
 ) {
     private val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
-    fun schedule(alarmId: Long, triggerAtMillis: Long, eventName: String) {
-        Log.d("AlarmDebug", "AlarmScheduler: schedule requested. id=$alarmId, time=$triggerAtMillis, event=$eventName")
+    fun schedule(
+        alarmId: Long,
+        triggerAtMillis: Long,
+        eventName: String,
+        alarmType: String,
+        timerMinutes: Int
+    ) {
+        Log.d("AlarmDebug", "AlarmScheduler: schedule requested. id=$alarmId, time=$triggerAtMillis, event=$eventName, type=$alarmType")
         val intent = Intent(context, AlarmBroadcastReceiver::class.java).apply {
             putExtra(EXTRA_ALARM_ID, alarmId)
             putExtra(EXTRA_EVENT_NAME, eventName)
             putExtra(EXTRA_TRIGGER_TIME, triggerAtMillis)
+            putExtra(EXTRA_ALARM_TYPE, alarmType)
+            putExtra(EXTRA_TIMER_MINUTES, timerMinutes)
         }
         val pi = PendingIntent.getBroadcast(
             context, alarmId.toInt(), intent,
@@ -55,5 +63,7 @@ class AlarmScheduler @Inject constructor(
         const val EXTRA_ALARM_ID = "alarm_id"
         const val EXTRA_EVENT_NAME = "event_name"
         const val EXTRA_TRIGGER_TIME = "trigger_time"
+        const val EXTRA_ALARM_TYPE = "alarm_type"
+        const val EXTRA_TIMER_MINUTES = "timer_minutes"
     }
 }

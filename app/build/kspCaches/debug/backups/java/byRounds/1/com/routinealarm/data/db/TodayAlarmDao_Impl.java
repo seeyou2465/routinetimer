@@ -49,7 +49,7 @@ public final class TodayAlarmDao_Impl implements TodayAlarmDao {
       @Override
       @NonNull
       protected String createQuery() {
-        return "INSERT OR REPLACE INTO `today_alarms` (`id`,`date`,`hour`,`minute`,`eventName`,`isEnabled`,`isTodayOnly`,`originalHour`,`originalMinute`) VALUES (nullif(?, 0),?,?,?,?,?,?,?,?)";
+        return "INSERT OR REPLACE INTO `today_alarms` (`id`,`date`,`hour`,`minute`,`eventName`,`isEnabled`,`isTodayOnly`,`originalHour`,`originalMinute`,`alarmType`,`timerMinutes`) VALUES (nullif(?, 0),?,?,?,?,?,?,?,?,?,?)";
       }
 
       @Override
@@ -66,6 +66,8 @@ public final class TodayAlarmDao_Impl implements TodayAlarmDao {
         statement.bindLong(7, _tmp_1);
         statement.bindLong(8, entity.getOriginalHour());
         statement.bindLong(9, entity.getOriginalMinute());
+        statement.bindString(10, entity.getAlarmType());
+        statement.bindLong(11, entity.getTimerMinutes());
       }
     };
     this.__deletionAdapterOfTodayAlarmEntity = new EntityDeletionOrUpdateAdapter<TodayAlarmEntity>(__db) {
@@ -85,7 +87,7 @@ public final class TodayAlarmDao_Impl implements TodayAlarmDao {
       @Override
       @NonNull
       protected String createQuery() {
-        return "UPDATE OR ABORT `today_alarms` SET `id` = ?,`date` = ?,`hour` = ?,`minute` = ?,`eventName` = ?,`isEnabled` = ?,`isTodayOnly` = ?,`originalHour` = ?,`originalMinute` = ? WHERE `id` = ?";
+        return "UPDATE OR ABORT `today_alarms` SET `id` = ?,`date` = ?,`hour` = ?,`minute` = ?,`eventName` = ?,`isEnabled` = ?,`isTodayOnly` = ?,`originalHour` = ?,`originalMinute` = ?,`alarmType` = ?,`timerMinutes` = ? WHERE `id` = ?";
       }
 
       @Override
@@ -102,7 +104,9 @@ public final class TodayAlarmDao_Impl implements TodayAlarmDao {
         statement.bindLong(7, _tmp_1);
         statement.bindLong(8, entity.getOriginalHour());
         statement.bindLong(9, entity.getOriginalMinute());
-        statement.bindLong(10, entity.getId());
+        statement.bindString(10, entity.getAlarmType());
+        statement.bindLong(11, entity.getTimerMinutes());
+        statement.bindLong(12, entity.getId());
       }
     };
     this.__preparedStmtOfDeleteOldNonTodayOnly = new SharedSQLiteStatement(__db) {
@@ -250,6 +254,8 @@ public final class TodayAlarmDao_Impl implements TodayAlarmDao {
           final int _cursorIndexOfIsTodayOnly = CursorUtil.getColumnIndexOrThrow(_cursor, "isTodayOnly");
           final int _cursorIndexOfOriginalHour = CursorUtil.getColumnIndexOrThrow(_cursor, "originalHour");
           final int _cursorIndexOfOriginalMinute = CursorUtil.getColumnIndexOrThrow(_cursor, "originalMinute");
+          final int _cursorIndexOfAlarmType = CursorUtil.getColumnIndexOrThrow(_cursor, "alarmType");
+          final int _cursorIndexOfTimerMinutes = CursorUtil.getColumnIndexOrThrow(_cursor, "timerMinutes");
           final List<TodayAlarmEntity> _result = new ArrayList<TodayAlarmEntity>(_cursor.getCount());
           while (_cursor.moveToNext()) {
             final TodayAlarmEntity _item;
@@ -275,7 +281,11 @@ public final class TodayAlarmDao_Impl implements TodayAlarmDao {
             _tmpOriginalHour = _cursor.getInt(_cursorIndexOfOriginalHour);
             final int _tmpOriginalMinute;
             _tmpOriginalMinute = _cursor.getInt(_cursorIndexOfOriginalMinute);
-            _item = new TodayAlarmEntity(_tmpId,_tmpDate,_tmpHour,_tmpMinute,_tmpEventName,_tmpIsEnabled,_tmpIsTodayOnly,_tmpOriginalHour,_tmpOriginalMinute);
+            final String _tmpAlarmType;
+            _tmpAlarmType = _cursor.getString(_cursorIndexOfAlarmType);
+            final int _tmpTimerMinutes;
+            _tmpTimerMinutes = _cursor.getInt(_cursorIndexOfTimerMinutes);
+            _item = new TodayAlarmEntity(_tmpId,_tmpDate,_tmpHour,_tmpMinute,_tmpEventName,_tmpIsEnabled,_tmpIsTodayOnly,_tmpOriginalHour,_tmpOriginalMinute,_tmpAlarmType,_tmpTimerMinutes);
             _result.add(_item);
           }
           return _result;
@@ -314,6 +324,8 @@ public final class TodayAlarmDao_Impl implements TodayAlarmDao {
           final int _cursorIndexOfIsTodayOnly = CursorUtil.getColumnIndexOrThrow(_cursor, "isTodayOnly");
           final int _cursorIndexOfOriginalHour = CursorUtil.getColumnIndexOrThrow(_cursor, "originalHour");
           final int _cursorIndexOfOriginalMinute = CursorUtil.getColumnIndexOrThrow(_cursor, "originalMinute");
+          final int _cursorIndexOfAlarmType = CursorUtil.getColumnIndexOrThrow(_cursor, "alarmType");
+          final int _cursorIndexOfTimerMinutes = CursorUtil.getColumnIndexOrThrow(_cursor, "timerMinutes");
           final List<TodayAlarmEntity> _result = new ArrayList<TodayAlarmEntity>(_cursor.getCount());
           while (_cursor.moveToNext()) {
             final TodayAlarmEntity _item;
@@ -339,7 +351,11 @@ public final class TodayAlarmDao_Impl implements TodayAlarmDao {
             _tmpOriginalHour = _cursor.getInt(_cursorIndexOfOriginalHour);
             final int _tmpOriginalMinute;
             _tmpOriginalMinute = _cursor.getInt(_cursorIndexOfOriginalMinute);
-            _item = new TodayAlarmEntity(_tmpId,_tmpDate,_tmpHour,_tmpMinute,_tmpEventName,_tmpIsEnabled,_tmpIsTodayOnly,_tmpOriginalHour,_tmpOriginalMinute);
+            final String _tmpAlarmType;
+            _tmpAlarmType = _cursor.getString(_cursorIndexOfAlarmType);
+            final int _tmpTimerMinutes;
+            _tmpTimerMinutes = _cursor.getInt(_cursorIndexOfTimerMinutes);
+            _item = new TodayAlarmEntity(_tmpId,_tmpDate,_tmpHour,_tmpMinute,_tmpEventName,_tmpIsEnabled,_tmpIsTodayOnly,_tmpOriginalHour,_tmpOriginalMinute,_tmpAlarmType,_tmpTimerMinutes);
             _result.add(_item);
           }
           return _result;

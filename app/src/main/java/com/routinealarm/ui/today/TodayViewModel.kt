@@ -58,7 +58,7 @@ class TodayViewModel @Inject constructor(
                     }
                     if (restored.isEnabled) {
                         scheduler.cancel(restored.id)
-                        scheduleIfFuture(restored.id, date, restored.hour, restored.minute, restored.eventName)
+                        scheduleIfFuture(restored)
                     }
                 } else {
                     scheduler.cancel(alarm.id)
@@ -74,8 +74,30 @@ class TodayViewModel @Inject constructor(
                 .filter { it.isEnabled }
                 .forEach { weekly ->
                     Log.d("AlarmDebug", "TodayViewModel: Found enabled weekly alarm: ${weekly.hour}:${weekly.minute}")
-                    val newId = todayRepo.add(dateStr, weekly.hour, weekly.minute, weekly.eventName, false)
-                    scheduleIfFuture(newId, date, weekly.hour, weekly.minute, weekly.eventName)
+                    val newId = todayRepo.add(
+                        dateStr,
+                        weekly.hour,
+                        weekly.minute,
+                        weekly.eventName,
+                        false,
+                        weekly.alarmType,
+                        weekly.timerMinutes
+                    )
+                    scheduleIfFuture(
+                        TodayAlarmEntity(
+                            id = newId,
+                            date = dateStr,
+                            hour = weekly.hour,
+                            minute = weekly.minute,
+                            eventName = weekly.eventName,
+                            isEnabled = true,
+                            isTodayOnly = false,
+                            originalHour = weekly.hour,
+                            originalMinute = weekly.minute,
+                            alarmType = weekly.alarmType,
+                            timerMinutes = weekly.timerMinutes
+                        )
+                    )
                 }
         }
     }
@@ -90,7 +112,7 @@ class TodayViewModel @Inject constructor(
             todayRepo.update(updated)
             if (updated.isEnabled) {
                 val date = LocalDate.parse(updated.date)
-                scheduleIfFuture(updated.id, date, updated.hour, updated.minute, updated.eventName)
+                scheduleIfFuture(updated)
             } else {
                 scheduler.cancel(updated.id)
             }
@@ -116,15 +138,29 @@ class TodayViewModel @Inject constructor(
             todayRepo.update(updated)
             val date = LocalDate.parse(updated.date)
             scheduler.cancel(updated.id)
-            scheduleIfFuture(updated.id, date, updated.hour, updated.minute, updated.eventName)
+            scheduleIfFuture(updated)
         }
     }
 
-    fun addTodayOnly(hour: Int, minute: Int, eventName: String) {
+    fun addTodayOnly(hour: Int, minute: Int, eventName: String, alarmType: String, timerMinutes: Int) {
         viewModelScope.launch {
             val date = _today.value
-            val id = todayRepo.add(date.toString(), hour, minute, eventName, true)
-            scheduleIfFuture(id, date, hour, minute, eventName)
+            val id = todayRepo.add(date.toString(), hour, minute, eventName, true, alarmType, timerMinutes)
+            scheduleIfFuture(
+                TodayAlarmEntity(
+                    id = id,
+                    date = date.toString(),
+                    hour = hour,
+                    minute = minute,
+                    eventName = eventName,
+                    isEnabled = true,
+                    isTodayOnly = true,
+                    originalHour = hour,
+                    originalMinute = minute,
+                    alarmType = alarmType,
+                    timerMinutes = timerMinutes
+                )
+            )
         }
     }
 
@@ -135,7 +171,14 @@ class TodayViewModel @Inject constructor(
         }
     }
 
-    fun updateAlarm(alarm: TodayAlarmEntity, hour: Int, minute: Int, eventName: String) {
+    fun updateAlarm(
+        alarm: TodayAlarmEntity,
+        hour: Int,
+        minute: Int,
+        eventName: String,
+        alarmType: String,
+        timerMinutes: Int
+    ) {
         viewModelScope.launch {
             val updated = alarm.copy(
                 hour = hour,
@@ -143,31 +186,33 @@ class TodayViewModel @Inject constructor(
                 eventName = eventName,
                 isEnabled = true,
                 originalHour = hour,
-                originalMinute = minute
+                originalMinute = minute,
+                alarmType = alarmType,
+                timerMinutes = timerMinutes
             )
             todayRepo.update(updated)
-            val date = LocalDate.parse(updated.date)
-            scheduleIfFuture(updated.id, date, updated.hour, updated.minute, updated.eventName)
+            scheduleIfFuture(updated)
         }
     }
 
-    private fun scheduleIfFuture(id: Long, date: LocalDate, hour: Int, minute: Int, eventName: String) {
+    private fun scheduleIfFuture(alarm: TodayAlarmEntity) {
+        val date = LocalDate.parse(alarm.date)
         // 現在時刻と比較してベースとなる日時を決める
         var targetDate = date
-        var millis = targetDate.atTime(hour, minute)
+        var millis = targetDate.atTime(alarm.hour, alarm.minute)
             .atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
         val now = System.currentTimeMillis()
         
         // もし計算された時間が過去なら、翌日の同じ時間に設定する
         if (millis <= now) {
             targetDate = LocalDate.now().plusDays(1)
-            millis = targetDate.atTime(hour, minute)
+            millis = targetDate.atTime(alarm.hour, alarm.minute)
                 .atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
             Log.d("AlarmDebug", "TodayViewModel: scheduleIfFuture -> Past detected. Adjusted targetDate to Tomorrow ($targetDate).")
         }
         
         Log.d("AlarmDebug", "TodayViewModel: scheduleIfFuture -> Scheduling for $millis (in ${millis - now} ms).")
-        scheduler.schedule(id, millis, eventName)
+        scheduler.schedule(alarm.id, millis, alarm.eventName, alarm.alarmType, alarm.timerMinutes)
     }
 
     private fun TodayAlarmEntity.normalizedOriginalHour(): Int =

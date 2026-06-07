@@ -421,25 +421,25 @@ public final class DaggerRoutineAlarmApp_HiltComponents_SingletonC {
 
     @IdentifierNameString
     private static final class LazyClassKeyProvider {
-      static String com_routinealarm_ui_settings_SettingsViewModel = "com.routinealarm.ui.settings.SettingsViewModel";
-
-      static String com_routinealarm_ui_today_TodayViewModel = "com.routinealarm.ui.today.TodayViewModel";
-
       static String com_routinealarm_ui_alarm_AlarmViewModel = "com.routinealarm.ui.alarm.AlarmViewModel";
+
+      static String com_routinealarm_ui_settings_SettingsViewModel = "com.routinealarm.ui.settings.SettingsViewModel";
 
       static String com_routinealarm_ui_week_WeekViewModel = "com.routinealarm.ui.week.WeekViewModel";
 
-      @KeepFieldType
-      SettingsViewModel com_routinealarm_ui_settings_SettingsViewModel2;
-
-      @KeepFieldType
-      TodayViewModel com_routinealarm_ui_today_TodayViewModel2;
+      static String com_routinealarm_ui_today_TodayViewModel = "com.routinealarm.ui.today.TodayViewModel";
 
       @KeepFieldType
       AlarmViewModel com_routinealarm_ui_alarm_AlarmViewModel2;
 
       @KeepFieldType
+      SettingsViewModel com_routinealarm_ui_settings_SettingsViewModel2;
+
+      @KeepFieldType
       WeekViewModel com_routinealarm_ui_week_WeekViewModel2;
+
+      @KeepFieldType
+      TodayViewModel com_routinealarm_ui_today_TodayViewModel2;
     }
   }
 
@@ -489,19 +489,19 @@ public final class DaggerRoutineAlarmApp_HiltComponents_SingletonC {
 
     @IdentifierNameString
     private static final class LazyClassKeyProvider {
-      static String com_routinealarm_ui_week_WeekViewModel = "com.routinealarm.ui.week.WeekViewModel";
-
       static String com_routinealarm_ui_alarm_AlarmViewModel = "com.routinealarm.ui.alarm.AlarmViewModel";
+
+      static String com_routinealarm_ui_week_WeekViewModel = "com.routinealarm.ui.week.WeekViewModel";
 
       static String com_routinealarm_ui_settings_SettingsViewModel = "com.routinealarm.ui.settings.SettingsViewModel";
 
       static String com_routinealarm_ui_today_TodayViewModel = "com.routinealarm.ui.today.TodayViewModel";
 
       @KeepFieldType
-      WeekViewModel com_routinealarm_ui_week_WeekViewModel2;
+      AlarmViewModel com_routinealarm_ui_alarm_AlarmViewModel2;
 
       @KeepFieldType
-      AlarmViewModel com_routinealarm_ui_alarm_AlarmViewModel2;
+      WeekViewModel com_routinealarm_ui_week_WeekViewModel2;
 
       @KeepFieldType
       SettingsViewModel com_routinealarm_ui_settings_SettingsViewModel2;

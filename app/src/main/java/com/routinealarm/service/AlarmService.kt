@@ -11,6 +11,9 @@ import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.routinealarm.R
+import com.routinealarm.data.db.ALARM_TYPE_ALARM
+import com.routinealarm.data.db.ALARM_TYPE_TIMER
+import com.routinealarm.data.db.DEFAULT_TIMER_MINUTES
 import com.routinealarm.ui.alarm.AlarmActivity
 
 class AlarmService : Service() {
@@ -36,10 +39,13 @@ class AlarmService : Service() {
         val alarmId = intent?.getLongExtra(AlarmScheduler.EXTRA_ALARM_ID, -1L) ?: -1L
         val eventName = intent?.getStringExtra(AlarmScheduler.EXTRA_EVENT_NAME) ?: ""
         val triggerTime = intent?.getLongExtra(AlarmScheduler.EXTRA_TRIGGER_TIME, 0L) ?: 0L
+        val alarmType = intent?.getStringExtra(AlarmScheduler.EXTRA_ALARM_TYPE) ?: ALARM_TYPE_ALARM
+        val timerMinutes = intent?.getIntExtra(AlarmScheduler.EXTRA_TIMER_MINUTES, DEFAULT_TIMER_MINUTES)
+            ?: DEFAULT_TIMER_MINUTES
 
         Log.d("AlarmDebug", "AlarmService: Building notification...")
         createNotificationChannel()
-        val notification = buildFullScreenNotification(alarmId, eventName, triggerTime)
+        val notification = buildFullScreenNotification(alarmId, eventName, triggerTime, alarmType, timerMinutes)
         
         Log.d("AlarmDebug", "AlarmService: Calling startForeground...")
         try {
@@ -57,9 +63,14 @@ class AlarmService : Service() {
             Log.e("AlarmDebug", "AlarmService: startForeground FAILED: ${e.message}", e)
         }
 
-        Log.d("AlarmDebug", "AlarmService: Starting ringtone and vibration...")
-        startRingtone()
-        startVibration()
+        if (alarmType == ALARM_TYPE_TIMER) {
+            Log.d("AlarmDebug", "AlarmService: Timer mode. Skipping ringtone and vibration.")
+            stopAlarmSound()
+        } else {
+            Log.d("AlarmDebug", "AlarmService: Starting ringtone and vibration...")
+            startRingtone()
+            startVibration()
+        }
 
         Log.d("AlarmDebug", "AlarmService: Starting AlarmActivity...")
         // AlarmActivityを起動 (既存フラグを使用)
@@ -68,6 +79,8 @@ class AlarmService : Service() {
             putExtra(AlarmScheduler.EXTRA_ALARM_ID, alarmId)
             putExtra(AlarmScheduler.EXTRA_EVENT_NAME, eventName)
             putExtra(AlarmScheduler.EXTRA_TRIGGER_TIME, triggerTime)
+            putExtra(AlarmScheduler.EXTRA_ALARM_TYPE, alarmType)
+            putExtra(AlarmScheduler.EXTRA_TIMER_MINUTES, timerMinutes)
         }
         startActivity(activityIntent)
 
@@ -113,20 +126,34 @@ class AlarmService : Service() {
         super.onDestroy()
     }
 
-    private fun buildFullScreenNotification(alarmId: Long, eventName: String, triggerTime: Long): Notification {
+    private fun buildFullScreenNotification(
+        alarmId: Long,
+        eventName: String,
+        triggerTime: Long,
+        alarmType: String,
+        timerMinutes: Int
+    ): Notification {
         val fullScreenIntent = Intent(this, AlarmActivity::class.java).apply {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             putExtra(AlarmScheduler.EXTRA_ALARM_ID, alarmId)
             putExtra(AlarmScheduler.EXTRA_EVENT_NAME, eventName)
             putExtra(AlarmScheduler.EXTRA_TRIGGER_TIME, triggerTime)
+            putExtra(AlarmScheduler.EXTRA_ALARM_TYPE, alarmType)
+            putExtra(AlarmScheduler.EXTRA_TIMER_MINUTES, timerMinutes)
         }
         val fullScreenPendingIntent = PendingIntent.getActivity(
             this, alarmId.toInt(), fullScreenIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
+        val contentTitle = when {
+            alarmType == ALARM_TYPE_TIMER && eventName.isBlank() -> "タイマー"
+            alarmType == ALARM_TYPE_TIMER -> "タイマー: $eventName"
+            eventName.isBlank() -> "アラーム"
+            else -> eventName
+        }
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_alarm)
-            .setContentTitle(if (eventName.isBlank()) "アラーム" else eventName)
+            .setContentTitle(contentTitle)
             .setPriority(NotificationCompat.PRIORITY_MAX)
             .setCategory(NotificationCompat.CATEGORY_ALARM)
             .setFullScreenIntent(fullScreenPendingIntent, true)

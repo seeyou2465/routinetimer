@@ -29,15 +29,30 @@ class WeekViewModel @Inject constructor(
         }
     }
 
-    fun addAlarm(dayOfWeek: Int, hour: Int, minute: Int, eventName: String) {
+    fun addAlarm(dayOfWeek: Int, hour: Int, minute: Int, eventName: String, alarmType: String, timerMinutes: Int) {
         viewModelScope.launch {
-            repo.add(dayOfWeek, hour, minute, eventName, isFromRoutine = false)
+            repo.add(dayOfWeek, hour, minute, eventName, isFromRoutine = false, alarmType, timerMinutes)
         }
     }
 
-    fun updateAlarm(alarm: WeeklyAlarmEntity, hour: Int, minute: Int, eventName: String) {
+    fun updateAlarm(
+        alarm: WeeklyAlarmEntity,
+        hour: Int,
+        minute: Int,
+        eventName: String,
+        alarmType: String,
+        timerMinutes: Int
+    ) {
         viewModelScope.launch {
-            repo.update(alarm.copy(hour = hour, minute = minute, eventName = eventName))
+            repo.update(
+                alarm.copy(
+                    hour = hour,
+                    minute = minute,
+                    eventName = eventName,
+                    alarmType = alarmType,
+                    timerMinutes = timerMinutes
+                )
+            )
         }
     }
 

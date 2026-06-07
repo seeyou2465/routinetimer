@@ -19,6 +19,9 @@ class AlarmViewModel @Inject constructor() : ViewModel() {
     private val _isSnoozing = MutableStateFlow(false)
     val isSnoozing: StateFlow<Boolean> = _isSnoozing
 
+    private val _timerRemainingSeconds = MutableStateFlow<Int?>(null)
+    val timerRemainingSeconds: StateFlow<Int?> = _timerRemainingSeconds
+
     /** アラームが再発火すべき時に呼ぶコールバック */
     var onSnoozeExpired: (() -> Unit)? = null
 
@@ -45,6 +48,25 @@ class AlarmViewModel @Inject constructor() : ViewModel() {
         countdownJob?.cancel()
         _isSnoozing.value = false
         _countdownSeconds.value = null
+    }
+
+    fun startTimer(seconds: Int) {
+        countdownJob?.cancel()
+        _isSnoozing.value = false
+        _countdownSeconds.value = null
+        _timerRemainingSeconds.value = seconds
+        countdownJob = viewModelScope.launch {
+            while ((_timerRemainingSeconds.value ?: 0) > 0) {
+                delay(1000L)
+                val remaining = (_timerRemainingSeconds.value ?: 0) - 1
+                _timerRemainingSeconds.value = remaining.coerceAtLeast(0)
+            }
+        }
+    }
+
+    fun addTimerMinutes(minutes: Int) {
+        val current = _timerRemainingSeconds.value ?: 0
+        _timerRemainingSeconds.value = current + minutes * 60
     }
 
     override fun onCleared() {

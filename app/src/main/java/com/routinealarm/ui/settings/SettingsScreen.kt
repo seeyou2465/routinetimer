@@ -233,8 +233,8 @@ private fun RoutineSubScreen(viewModel: SettingsViewModel) {
         TimePickerDialog(
             title = "ルーティンを追加",
             onDismiss = { showAddDialog = false },
-            onConfirm = { h, m, name ->
-                viewModel.addRoutine(h, m, name)
+            onConfirm = { h, m, name, alarmType, timerMinutes ->
+                viewModel.addRoutine(h, m, name, alarmType, timerMinutes)
                 showAddDialog = false
             }
         )
@@ -246,9 +246,11 @@ private fun RoutineSubScreen(viewModel: SettingsViewModel) {
             initialHour = target.hour,
             initialMinute = target.minute,
             initialName = target.eventName,
+            initialAlarmType = target.alarmType,
+            initialTimerMinutes = target.timerMinutes,
             onDismiss = { editTarget = null },
-            onConfirm = { h, m, name ->
-                viewModel.updateRoutine(target, h, m, name)
+            onConfirm = { h, m, name, alarmType, timerMinutes ->
+                viewModel.updateRoutine(target, h, m, name, alarmType, timerMinutes)
                 editTarget = null
             }
         )
@@ -268,8 +270,8 @@ private fun RoutineSubScreen(viewModel: SettingsViewModel) {
     if (showCopyDialog) {
         CopyRoutineDialog(
             onDismiss = { showCopyDialog = false },
-            onCopyToDay = { day ->
-                viewModel.copyRoutineToDay(day)
+            onCopyToDays = { days ->
+                viewModel.copyRoutineToDays(days)
                 showCopyDialog = false
             },
             onCopyToAll = {
@@ -320,26 +322,76 @@ private fun DeleteRoutineConfirmDialog(
 @Composable
 private fun CopyRoutineDialog(
     onDismiss: () -> Unit,
-    onCopyToDay: (Int) -> Unit,
+    onCopyToDays: (Set<Int>) -> Unit,
     onCopyToAll: () -> Unit
 ) {
+    var selectedDays by remember { mutableStateOf<Set<Int>>(emptySet()) }
+
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text("曜日へコピー") },
         text = {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text("コピー先の曜日を選択してください。\n[全体]タグ付きアラームが置き換わります。",
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Text("コピー先の曜日を選択してください。\n選択した曜日の[全体]タグ付きアラームが置き換わります。",
                     fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f))
                 Spacer(modifier = Modifier.height(4.dp))
                 DAY_LABELS.forEachIndexed { idx, label ->
-                    OutlinedButton(
-                        onClick = { onCopyToDay(idx + 1) },
-                        modifier = Modifier.fillMaxWidth()
+                    val day = idx + 1
+                    val selected = day in selectedDays
+                    Surface(
+                        onClick = {
+                            selectedDays = if (selected) {
+                                selectedDays - day
+                            } else {
+                                selectedDays + day
+                            }
+                        },
+                        shape = MaterialTheme.shapes.medium,
+                        color = if (selected) {
+                            MaterialTheme.colorScheme.primaryContainer
+                        } else {
+                            MaterialTheme.colorScheme.surface
+                        },
+                        tonalElevation = if (selected) 2.dp else 0.dp,
+                        border = ButtonDefaults.outlinedButtonBorder
                     ) {
-                        Text("${label}曜日")
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 12.dp, vertical = 8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Checkbox(
+                                checked = selected,
+                                onCheckedChange = { checked ->
+                                    selectedDays = if (checked) {
+                                        selectedDays + day
+                                    } else {
+                                        selectedDays - day
+                                    }
+                                }
+                            )
+                            Text(
+                                "${label}曜日",
+                                fontSize = 15.sp,
+                                fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium,
+                                color = if (selected) {
+                                    MaterialTheme.colorScheme.onPrimaryContainer
+                                } else {
+                                    MaterialTheme.colorScheme.onSurface
+                                }
+                            )
+                        }
                     }
                 }
                 HorizontalDivider()
+                Button(
+                    onClick = { onCopyToDays(selectedDays) },
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = selectedDays.isNotEmpty()
+                ) {
+                    Text("選択した曜日へコピー")
+                }
                 Button(onClick = onCopyToAll, modifier = Modifier.fillMaxWidth()) {
                     Text("全曜日へコピー")
                 }

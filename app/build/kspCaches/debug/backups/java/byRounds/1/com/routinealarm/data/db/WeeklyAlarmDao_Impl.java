@@ -46,7 +46,7 @@ public final class WeeklyAlarmDao_Impl implements WeeklyAlarmDao {
       @Override
       @NonNull
       protected String createQuery() {
-        return "INSERT OR REPLACE INTO `weekly_alarms` (`id`,`dayOfWeek`,`hour`,`minute`,`eventName`,`isEnabled`,`isFromRoutine`) VALUES (nullif(?, 0),?,?,?,?,?,?)";
+        return "INSERT OR REPLACE INTO `weekly_alarms` (`id`,`dayOfWeek`,`hour`,`minute`,`eventName`,`isEnabled`,`isFromRoutine`,`alarmType`,`timerMinutes`) VALUES (nullif(?, 0),?,?,?,?,?,?,?,?)";
       }
 
       @Override
@@ -61,6 +61,8 @@ public final class WeeklyAlarmDao_Impl implements WeeklyAlarmDao {
         statement.bindLong(6, _tmp);
         final int _tmp_1 = entity.isFromRoutine() ? 1 : 0;
         statement.bindLong(7, _tmp_1);
+        statement.bindString(8, entity.getAlarmType());
+        statement.bindLong(9, entity.getTimerMinutes());
       }
     };
     this.__deletionAdapterOfWeeklyAlarmEntity = new EntityDeletionOrUpdateAdapter<WeeklyAlarmEntity>(__db) {
@@ -80,7 +82,7 @@ public final class WeeklyAlarmDao_Impl implements WeeklyAlarmDao {
       @Override
       @NonNull
       protected String createQuery() {
-        return "UPDATE OR ABORT `weekly_alarms` SET `id` = ?,`dayOfWeek` = ?,`hour` = ?,`minute` = ?,`eventName` = ?,`isEnabled` = ?,`isFromRoutine` = ? WHERE `id` = ?";
+        return "UPDATE OR ABORT `weekly_alarms` SET `id` = ?,`dayOfWeek` = ?,`hour` = ?,`minute` = ?,`eventName` = ?,`isEnabled` = ?,`isFromRoutine` = ?,`alarmType` = ?,`timerMinutes` = ? WHERE `id` = ?";
       }
 
       @Override
@@ -95,7 +97,9 @@ public final class WeeklyAlarmDao_Impl implements WeeklyAlarmDao {
         statement.bindLong(6, _tmp);
         final int _tmp_1 = entity.isFromRoutine() ? 1 : 0;
         statement.bindLong(7, _tmp_1);
-        statement.bindLong(8, entity.getId());
+        statement.bindString(8, entity.getAlarmType());
+        statement.bindLong(9, entity.getTimerMinutes());
+        statement.bindLong(10, entity.getId());
       }
     };
     this.__preparedStmtOfDeleteRoutineCopiesByDay = new SharedSQLiteStatement(__db) {
@@ -210,6 +214,8 @@ public final class WeeklyAlarmDao_Impl implements WeeklyAlarmDao {
           final int _cursorIndexOfEventName = CursorUtil.getColumnIndexOrThrow(_cursor, "eventName");
           final int _cursorIndexOfIsEnabled = CursorUtil.getColumnIndexOrThrow(_cursor, "isEnabled");
           final int _cursorIndexOfIsFromRoutine = CursorUtil.getColumnIndexOrThrow(_cursor, "isFromRoutine");
+          final int _cursorIndexOfAlarmType = CursorUtil.getColumnIndexOrThrow(_cursor, "alarmType");
+          final int _cursorIndexOfTimerMinutes = CursorUtil.getColumnIndexOrThrow(_cursor, "timerMinutes");
           final List<WeeklyAlarmEntity> _result = new ArrayList<WeeklyAlarmEntity>(_cursor.getCount());
           while (_cursor.moveToNext()) {
             final WeeklyAlarmEntity _item;
@@ -231,7 +237,11 @@ public final class WeeklyAlarmDao_Impl implements WeeklyAlarmDao {
             final int _tmp_1;
             _tmp_1 = _cursor.getInt(_cursorIndexOfIsFromRoutine);
             _tmpIsFromRoutine = _tmp_1 != 0;
-            _item = new WeeklyAlarmEntity(_tmpId,_tmpDayOfWeek,_tmpHour,_tmpMinute,_tmpEventName,_tmpIsEnabled,_tmpIsFromRoutine);
+            final String _tmpAlarmType;
+            _tmpAlarmType = _cursor.getString(_cursorIndexOfAlarmType);
+            final int _tmpTimerMinutes;
+            _tmpTimerMinutes = _cursor.getInt(_cursorIndexOfTimerMinutes);
+            _item = new WeeklyAlarmEntity(_tmpId,_tmpDayOfWeek,_tmpHour,_tmpMinute,_tmpEventName,_tmpIsEnabled,_tmpIsFromRoutine,_tmpAlarmType,_tmpTimerMinutes);
             _result.add(_item);
           }
           return _result;
@@ -264,6 +274,8 @@ public final class WeeklyAlarmDao_Impl implements WeeklyAlarmDao {
           final int _cursorIndexOfEventName = CursorUtil.getColumnIndexOrThrow(_cursor, "eventName");
           final int _cursorIndexOfIsEnabled = CursorUtil.getColumnIndexOrThrow(_cursor, "isEnabled");
           final int _cursorIndexOfIsFromRoutine = CursorUtil.getColumnIndexOrThrow(_cursor, "isFromRoutine");
+          final int _cursorIndexOfAlarmType = CursorUtil.getColumnIndexOrThrow(_cursor, "alarmType");
+          final int _cursorIndexOfTimerMinutes = CursorUtil.getColumnIndexOrThrow(_cursor, "timerMinutes");
           final List<WeeklyAlarmEntity> _result = new ArrayList<WeeklyAlarmEntity>(_cursor.getCount());
           while (_cursor.moveToNext()) {
             final WeeklyAlarmEntity _item;
@@ -285,7 +297,11 @@ public final class WeeklyAlarmDao_Impl implements WeeklyAlarmDao {
             final int _tmp_1;
             _tmp_1 = _cursor.getInt(_cursorIndexOfIsFromRoutine);
             _tmpIsFromRoutine = _tmp_1 != 0;
-            _item = new WeeklyAlarmEntity(_tmpId,_tmpDayOfWeek,_tmpHour,_tmpMinute,_tmpEventName,_tmpIsEnabled,_tmpIsFromRoutine);
+            final String _tmpAlarmType;
+            _tmpAlarmType = _cursor.getString(_cursorIndexOfAlarmType);
+            final int _tmpTimerMinutes;
+            _tmpTimerMinutes = _cursor.getInt(_cursorIndexOfTimerMinutes);
+            _item = new WeeklyAlarmEntity(_tmpId,_tmpDayOfWeek,_tmpHour,_tmpMinute,_tmpEventName,_tmpIsEnabled,_tmpIsFromRoutine,_tmpAlarmType,_tmpTimerMinutes);
             _result.add(_item);
           }
           return _result;

@@ -25,11 +25,29 @@ object DatabaseModule {
         }
     }
 
+    private val MIGRATION_2_3 = object : Migration(2, 3) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("ALTER TABLE routine_entries ADD COLUMN alarmType TEXT NOT NULL DEFAULT 'ALARM'")
+            db.execSQL("ALTER TABLE routine_entries ADD COLUMN timerMinutes INTEGER NOT NULL DEFAULT 10")
+            db.execSQL("ALTER TABLE weekly_alarms ADD COLUMN alarmType TEXT NOT NULL DEFAULT 'ALARM'")
+            db.execSQL("ALTER TABLE weekly_alarms ADD COLUMN timerMinutes INTEGER NOT NULL DEFAULT 10")
+            db.execSQL("ALTER TABLE today_alarms ADD COLUMN alarmType TEXT NOT NULL DEFAULT 'ALARM'")
+            db.execSQL("ALTER TABLE today_alarms ADD COLUMN timerMinutes INTEGER NOT NULL DEFAULT 10")
+        }
+    }
+
+    private val MIGRATION_1_3 = object : Migration(1, 3) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            MIGRATION_1_2.migrate(db)
+            MIGRATION_2_3.migrate(db)
+        }
+    }
+
     @Provides
     @Singleton
     fun provideDatabase(@ApplicationContext ctx: Context): AppDatabase =
         Room.databaseBuilder(ctx, AppDatabase::class.java, "routine_alarm.db")
-            .addMigrations(MIGRATION_1_2)
+            .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_1_3)
             .build()
 
     @Provides fun provideRoutineEntryDao(db: AppDatabase): RoutineEntryDao = db.routineEntryDao()

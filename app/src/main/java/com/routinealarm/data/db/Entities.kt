@@ -10,7 +10,9 @@ data class RoutineEntryEntity(
     val hour: Int,
     val minute: Int,
     val eventName: String,
-    val sortOrder: Int = 0
+    val sortOrder: Int = 0,
+    @ColumnInfo(defaultValue = "'ALARM'") val alarmType: String = ALARM_TYPE_ALARM,
+    @ColumnInfo(defaultValue = "10") val timerMinutes: Int = DEFAULT_TIMER_MINUTES
 )
 
 @Entity(tableName = "weekly_alarms")
@@ -21,7 +23,9 @@ data class WeeklyAlarmEntity(
     val minute: Int,
     val eventName: String,
     val isEnabled: Boolean,
-    val isFromRoutine: Boolean // [全体]タグ: 設定タブからコピーされたアラームか否か
+    val isFromRoutine: Boolean, // [全体]タグ: 設定タブからコピーされたアラームか否か
+    @ColumnInfo(defaultValue = "'ALARM'") val alarmType: String = ALARM_TYPE_ALARM,
+    @ColumnInfo(defaultValue = "10") val timerMinutes: Int = DEFAULT_TIMER_MINUTES
 )
 
 @Entity(tableName = "today_alarms")
@@ -34,5 +38,11 @@ data class TodayAlarmEntity(
     val isEnabled: Boolean,
     val isTodayOnly: Boolean,  // 本日限定フラグ
     @ColumnInfo(defaultValue = "-1") val originalHour: Int = -1,
-    @ColumnInfo(defaultValue = "-1") val originalMinute: Int = -1
+    @ColumnInfo(defaultValue = "-1") val originalMinute: Int = -1,
+    @ColumnInfo(defaultValue = "'ALARM'") val alarmType: String = ALARM_TYPE_ALARM,
+    @ColumnInfo(defaultValue = "10") val timerMinutes: Int = DEFAULT_TIMER_MINUTES
 )
+
+const val ALARM_TYPE_ALARM = "ALARM"
+const val ALARM_TYPE_TIMER = "TIMER"
+const val DEFAULT_TIMER_MINUTES = 10

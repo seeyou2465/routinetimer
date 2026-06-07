@@ -11,8 +11,16 @@ class RoutineRepository @Inject constructor(
 ) {
     fun getAll(): Flow<List<RoutineEntryEntity>> = dao.getAll()
 
-    suspend fun add(hour: Int, minute: Int, eventName: String) {
-        dao.insert(RoutineEntryEntity(hour = hour, minute = minute, eventName = eventName))
+    suspend fun add(hour: Int, minute: Int, eventName: String, alarmType: String, timerMinutes: Int) {
+        dao.insert(
+            RoutineEntryEntity(
+                hour = hour,
+                minute = minute,
+                eventName = eventName,
+                alarmType = alarmType,
+                timerMinutes = timerMinutes
+            )
+        )
     }
 
     suspend fun update(entry: RoutineEntryEntity) = dao.update(entry)
@@ -30,11 +38,14 @@ class WeeklyAlarmRepository @Inject constructor(
 
     suspend fun add(
         dayOfWeek: Int, hour: Int, minute: Int,
-        eventName: String, isFromRoutine: Boolean = false
+        eventName: String, isFromRoutine: Boolean = false,
+        alarmType: String = ALARM_TYPE_ALARM,
+        timerMinutes: Int = DEFAULT_TIMER_MINUTES
     ): Long = dao.insert(
         WeeklyAlarmEntity(
             dayOfWeek = dayOfWeek, hour = hour, minute = minute,
-            eventName = eventName, isEnabled = true, isFromRoutine = isFromRoutine
+            eventName = eventName, isEnabled = true, isFromRoutine = isFromRoutine,
+            alarmType = alarmType, timerMinutes = timerMinutes
         )
     )
 
@@ -49,7 +60,8 @@ class WeeklyAlarmRepository @Inject constructor(
             dao.insert(
                 WeeklyAlarmEntity(
                     dayOfWeek = dayOfWeek, hour = r.hour, minute = r.minute,
-                    eventName = r.eventName, isEnabled = true, isFromRoutine = true
+                    eventName = r.eventName, isEnabled = true, isFromRoutine = true,
+                    alarmType = r.alarmType, timerMinutes = r.timerMinutes
                 )
             )
         }
@@ -66,12 +78,15 @@ class TodayAlarmRepository @Inject constructor(
 
     suspend fun add(
         date: String, hour: Int, minute: Int,
-        eventName: String, isTodayOnly: Boolean = false
+        eventName: String, isTodayOnly: Boolean = false,
+        alarmType: String = ALARM_TYPE_ALARM,
+        timerMinutes: Int = DEFAULT_TIMER_MINUTES
     ): Long = dao.insert(
         TodayAlarmEntity(
             date = date, hour = hour, minute = minute,
             eventName = eventName, isEnabled = true, isTodayOnly = isTodayOnly,
-            originalHour = hour, originalMinute = minute
+            originalHour = hour, originalMinute = minute,
+            alarmType = alarmType, timerMinutes = timerMinutes
         )
     )
 

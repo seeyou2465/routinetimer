@@ -55,7 +55,13 @@ class BootReceiver : BroadcastReceiver() {
             }
             
             android.util.Log.d("AlarmDebug", "BootReceiver: Scheduling for $triggerMillis")
-            scheduler.schedule(alarm.id, triggerMillis, alarm.eventName)
+            scheduler.schedule(
+                alarm.id,
+                triggerMillis,
+                alarm.eventName,
+                alarm.alarmType,
+                alarm.timerMinutes
+            )
         }
     }
 }

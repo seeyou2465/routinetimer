@@ -11,6 +11,8 @@ class AlarmBroadcastReceiver : BroadcastReceiver() {
         val alarmId = intent.getLongExtra(AlarmScheduler.EXTRA_ALARM_ID, -1L)
         val eventName = intent.getStringExtra(AlarmScheduler.EXTRA_EVENT_NAME) ?: ""
         val triggerTime = intent.getLongExtra(AlarmScheduler.EXTRA_TRIGGER_TIME, 0L)
+        val alarmType = intent.getStringExtra(AlarmScheduler.EXTRA_ALARM_TYPE) ?: com.routinealarm.data.db.ALARM_TYPE_ALARM
+        val timerMinutes = intent.getIntExtra(AlarmScheduler.EXTRA_TIMER_MINUTES, com.routinealarm.data.db.DEFAULT_TIMER_MINUTES)
 
         Log.d("AlarmDebug", "AlarmBroadcastReceiver: onReceive called! id=$alarmId, event=$eventName, time=$triggerTime")
 
@@ -18,6 +20,8 @@ class AlarmBroadcastReceiver : BroadcastReceiver() {
             putExtra(AlarmScheduler.EXTRA_ALARM_ID, alarmId)
             putExtra(AlarmScheduler.EXTRA_EVENT_NAME, eventName)
             putExtra(AlarmScheduler.EXTRA_TRIGGER_TIME, triggerTime)
+            putExtra(AlarmScheduler.EXTRA_ALARM_TYPE, alarmType)
+            putExtra(AlarmScheduler.EXTRA_TIMER_MINUTES, timerMinutes)
         }
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

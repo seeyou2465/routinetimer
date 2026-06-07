@@ -90,8 +90,8 @@ fun TodayScreen(viewModel: TodayViewModel = hiltViewModel()) {
         TimePickerDialog(
             title = "本日のみアラームを追加",
             onDismiss = { showAddDialog = false },
-            onConfirm = { h, m, name ->
-                viewModel.addTodayOnly(h, m, name)
+            onConfirm = { h, m, name, alarmType, timerMinutes ->
+                viewModel.addTodayOnly(h, m, name, alarmType, timerMinutes)
                 showAddDialog = false
             }
         )
@@ -103,9 +103,11 @@ fun TodayScreen(viewModel: TodayViewModel = hiltViewModel()) {
             initialHour = target.hour,
             initialMinute = target.minute,
             initialName = target.eventName,
+            initialAlarmType = target.alarmType,
+            initialTimerMinutes = target.timerMinutes,
             onDismiss = { editTarget = null },
-            onConfirm = { h, m, name ->
-                viewModel.updateAlarm(target, h, m, name)
+            onConfirm = { h, m, name, alarmType, timerMinutes ->
+                viewModel.updateAlarm(target, h, m, name, alarmType, timerMinutes)
                 editTarget = null
             }
         )

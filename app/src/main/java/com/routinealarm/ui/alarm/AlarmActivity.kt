@@ -23,6 +23,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.routinealarm.service.AlarmScheduler
 import com.routinealarm.service.AlarmService
+import com.routinealarm.data.db.ALARM_TYPE_ALARM
+import com.routinealarm.data.db.ALARM_TYPE_TIMER
+import com.routinealarm.data.db.DEFAULT_TIMER_MINUTES
 import com.routinealarm.ui.theme.RoutineAlarmTheme
 import dagger.hilt.android.AndroidEntryPoint
 import java.text.SimpleDateFormat
@@ -58,10 +61,18 @@ class AlarmActivity : ComponentActivity() {
         val alarmId = intent.getLongExtra(AlarmScheduler.EXTRA_ALARM_ID, -1L)
         val eventName = intent.getStringExtra(AlarmScheduler.EXTRA_EVENT_NAME) ?: ""
         val triggerTime = intent.getLongExtra(AlarmScheduler.EXTRA_TRIGGER_TIME, 0L)
+        val alarmType = intent.getStringExtra(AlarmScheduler.EXTRA_ALARM_TYPE) ?: ALARM_TYPE_ALARM
+        val timerMinutes = intent.getIntExtra(AlarmScheduler.EXTRA_TIMER_MINUTES, DEFAULT_TIMER_MINUTES)
 
         // スヌーズ期限で音を再開する
         viewModel.onSnoozeExpired = {
-            restartAlarmSound(alarmId, eventName, triggerTime)
+            if (alarmType != ALARM_TYPE_TIMER) {
+                restartAlarmSound(alarmId, eventName, triggerTime)
+            }
+        }
+
+        if (alarmType == ALARM_TYPE_TIMER) {
+            viewModel.startTimer(timerMinutes.coerceAtLeast(1) * 60)
         }
 
         setContent {
@@ -69,12 +80,17 @@ class AlarmActivity : ComponentActivity() {
                 AlarmScreen(
                     eventName = eventName,
                     triggerTime = triggerTime,
+                    alarmType = alarmType,
                     viewModel = viewModel,
                     onStop = { stopAlarm(finish = false) },
                     onDone = { stopAlarm(finish = true) },
                     onSnooze = { minutes ->
-                        stopAlarmSound()
-                        viewModel.startSnooze(minutes * 60)
+                        if (alarmType == ALARM_TYPE_TIMER) {
+                            viewModel.addTimerMinutes(minutes)
+                        } else {
+                            stopAlarmSound()
+                            viewModel.startSnooze(minutes * 60)
+                        }
                     }
                 )
             }
@@ -104,6 +120,8 @@ class AlarmActivity : ComponentActivity() {
             putExtra(AlarmScheduler.EXTRA_ALARM_ID, alarmId)
             putExtra(AlarmScheduler.EXTRA_EVENT_NAME, eventName)
             putExtra(AlarmScheduler.EXTRA_TRIGGER_TIME, triggerTime)
+            putExtra(AlarmScheduler.EXTRA_ALARM_TYPE, ALARM_TYPE_ALARM)
+            putExtra(AlarmScheduler.EXTRA_TIMER_MINUTES, DEFAULT_TIMER_MINUTES)
             action = ACTION_RESTART_SOUND
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -132,6 +150,7 @@ private fun alarmScreenEventNameFontSize(name: String): TextUnit = when {
 fun AlarmScreen(
     eventName: String,
     triggerTime: Long,
+    alarmType: String,
     viewModel: AlarmViewModel,
     onStop: () -> Unit,
     onDone: () -> Unit,
@@ -139,6 +158,7 @@ fun AlarmScreen(
 ) {
     val countdownSeconds by viewModel.countdownSeconds.collectAsState()
     val isSnoozing by viewModel.isSnoozing.collectAsState()
+    val timerRemainingSeconds by viewModel.timerRemainingSeconds.collectAsState()
 
     val timeStr = remember(triggerTime) {
         if (triggerTime == 0L) "" else
@@ -156,6 +176,19 @@ fun AlarmScreen(
             verticalArrangement = Arrangement.Center,
             modifier = Modifier.padding(32.dp)
         ) {
+            if (alarmType == ALARM_TYPE_TIMER) {
+                val remaining = timerRemainingSeconds ?: 0
+                val mins = remaining / 60
+                val secs = remaining % 60
+                Text(
+                    text = "タイマー %02d:%02d".format(mins, secs),
+                    fontSize = 34.sp,
+                    color = Color(0xFFFFE082),
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
+            }
+
             // アラーム時刻
             Text(
                 text = timeStr,
@@ -183,7 +216,7 @@ fun AlarmScreen(
             }
 
             // スヌーズカウントダウン
-            if (isSnoozing && countdownSeconds != null) {
+            if (alarmType != ALARM_TYPE_TIMER && isSnoozing && countdownSeconds != null) {
                 val mins = countdownSeconds!! / 60
                 val secs = countdownSeconds!! % 60
                 Text(

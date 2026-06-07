@@ -28,6 +28,9 @@ import androidx.compose.ui.window.Dialog
 import com.routinealarm.data.db.TodayAlarmEntity
 import com.routinealarm.data.db.WeeklyAlarmEntity
 import com.routinealarm.data.db.RoutineEntryEntity
+import com.routinealarm.data.db.ALARM_TYPE_ALARM
+import com.routinealarm.data.db.ALARM_TYPE_TIMER
+import com.routinealarm.data.db.DEFAULT_TIMER_MINUTES
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
@@ -202,6 +205,9 @@ fun AlarmCardToday(
                     if (alarm.isTodayOnly) {
                         Text("本日のみ", fontSize = 11.sp, color = Color(0xFFF57C00))
                     }
+                    if (alarm.alarmType == ALARM_TYPE_TIMER) {
+                        Text("タイマー ${alarm.timerMinutes}分", fontSize = 11.sp, color = MaterialTheme.colorScheme.secondary)
+                    }
                 }
                 Switch(checked = alarm.isEnabled, onCheckedChange = { currentOnToggle() })
                 if (alarm.isTodayOnly) {
@@ -343,6 +349,9 @@ fun AlarmCardWeekly(
                     if (alarm.isFromRoutine) {
                         Text("[全体]", fontSize = 11.sp, color = Color(0xFF0097A7))
                     }
+                    if (alarm.alarmType == ALARM_TYPE_TIMER) {
+                        Text("タイマー ${alarm.timerMinutes}分", fontSize = 11.sp, color = MaterialTheme.colorScheme.secondary)
+                    }
                 }
                 if (!alarm.isFromRoutine) {
                     IconButton(onClick = onDelete) {
@@ -438,6 +447,9 @@ fun RoutineCard(
                             )
                         }
                     }
+                    if (entry.alarmType == ALARM_TYPE_TIMER) {
+                        Text("タイマー ${entry.timerMinutes}分", fontSize = 11.sp, color = MaterialTheme.colorScheme.secondary)
+                    }
                 }
             }
         }
@@ -452,13 +464,21 @@ fun TimePickerDialog(
     initialHour: Int = 7,
     initialMinute: Int = 0,
     initialName: String = "",
+    initialAlarmType: String = ALARM_TYPE_ALARM,
+    initialTimerMinutes: Int = DEFAULT_TIMER_MINUTES,
     onDismiss: () -> Unit,
-    onConfirm: (hour: Int, minute: Int, name: String) -> Unit
+    onConfirm: (hour: Int, minute: Int, name: String, alarmType: String, timerMinutes: Int) -> Unit
 ) {
     var hourStr by remember { mutableStateOf(initialHour.toString().padStart(2, '0')) }
     var minuteStr by remember { mutableStateOf(initialMinute.toString().padStart(2, '0')) }
     var name by remember { mutableStateOf(initialName) }
     var useClockInput by remember { mutableStateOf(true) }
+    var alarmType by remember {
+        mutableStateOf(if (initialAlarmType == ALARM_TYPE_TIMER) ALARM_TYPE_TIMER else ALARM_TYPE_ALARM)
+    }
+    var timerMinutesStr by remember {
+        mutableStateOf(initialTimerMinutes.coerceIn(1, 999).toString())
+    }
     val timePickerState = rememberTimePickerState(
         initialHour = initialHour,
         initialMinute = initialMinute,
@@ -545,6 +565,42 @@ fun TimePickerDialog(
                     singleLine = true
                 )
 
+                Spacer(modifier = Modifier.height(12.dp))
+
+                SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
+                    SegmentedButton(
+                        selected = alarmType == ALARM_TYPE_ALARM,
+                        onClick = { alarmType = ALARM_TYPE_ALARM },
+                        shape = SegmentedButtonDefaults.itemShape(index = 0, count = 2)
+                    ) {
+                        Text("アラーム")
+                    }
+                    SegmentedButton(
+                        selected = alarmType == ALARM_TYPE_TIMER,
+                        onClick = { alarmType = ALARM_TYPE_TIMER },
+                        shape = SegmentedButtonDefaults.itemShape(index = 1, count = 2)
+                    ) {
+                        Text("タイマー")
+                    }
+                }
+
+                if (alarmType == ALARM_TYPE_TIMER) {
+                    Spacer(modifier = Modifier.height(12.dp))
+                    OutlinedTextField(
+                        value = timerMinutesStr,
+                        onValueChange = { value ->
+                            if (value.length <= 3 && value.all { it.isDigit() }) {
+                                timerMinutesStr = value
+                            }
+                        },
+                        label = { Text("タイマー時間") },
+                        suffix = { Text("分") },
+                        singleLine = true,
+                        isError = timerMinutesStr.toIntOrNull()?.let { it !in 1..999 } ?: true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
@@ -561,7 +617,10 @@ fun TimePickerDialog(
                         } else {
                             minuteStr.toIntOrNull()?.coerceIn(0, 59) ?: initialMinute
                         }
-                        onConfirm(h, m, name.trim())
+                        val timerMinutes = timerMinutesStr.toIntOrNull()
+                            ?.coerceIn(1, 999)
+                            ?: DEFAULT_TIMER_MINUTES
+                        onConfirm(h, m, name.trim(), alarmType, timerMinutes)
                     }) { Text("OK") }
                 }
             }

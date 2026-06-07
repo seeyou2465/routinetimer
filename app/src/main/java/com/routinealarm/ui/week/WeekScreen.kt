@@ -118,9 +118,11 @@ fun WeekScreen(viewModel: WeekViewModel = hiltViewModel()) {
                         initialHour = target.hour,
                         initialMinute = target.minute,
                         initialName = target.eventName,
+                        initialAlarmType = target.alarmType,
+                        initialTimerMinutes = target.timerMinutes,
                         onDismiss = { editTarget = null },
-                        onConfirm = { h, m, name ->
-                            viewModel.updateAlarm(target, h, m, name)
+                        onConfirm = { h, m, name, alarmType, timerMinutes ->
+                            viewModel.updateAlarm(target, h, m, name, alarmType, timerMinutes)
                             editTarget = null
                         }
                     )
@@ -135,8 +137,8 @@ fun WeekScreen(viewModel: WeekViewModel = hiltViewModel()) {
         TimePickerDialog(
             title = "${DAY_LABELS[pagerState.currentPage]}曜日のアラームを追加",
             onDismiss = { showAddDialog = false },
-            onConfirm = { h, m, name ->
-                viewModel.addAlarm(currentDay, h, m, name)
+            onConfirm = { h, m, name, alarmType, timerMinutes ->
+                viewModel.addAlarm(currentDay, h, m, name, alarmType, timerMinutes)
                 showAddDialog = false
             }
         )

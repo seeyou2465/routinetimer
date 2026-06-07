@@ -38,12 +38,29 @@ class SettingsViewModel @Inject constructor(
             settingsRepo.getTodayDelayMinutes()
         )
 
-    fun addRoutine(hour: Int, minute: Int, eventName: String) {
-        viewModelScope.launch { routineRepo.add(hour, minute, eventName) }
+    fun addRoutine(hour: Int, minute: Int, eventName: String, alarmType: String, timerMinutes: Int) {
+        viewModelScope.launch { routineRepo.add(hour, minute, eventName, alarmType, timerMinutes) }
     }
 
-    fun updateRoutine(entry: RoutineEntryEntity, hour: Int, minute: Int, eventName: String) {
-        viewModelScope.launch { routineRepo.update(entry.copy(hour = hour, minute = minute, eventName = eventName)) }
+    fun updateRoutine(
+        entry: RoutineEntryEntity,
+        hour: Int,
+        minute: Int,
+        eventName: String,
+        alarmType: String,
+        timerMinutes: Int
+    ) {
+        viewModelScope.launch {
+            routineRepo.update(
+                entry.copy(
+                    hour = hour,
+                    minute = minute,
+                    eventName = eventName,
+                    alarmType = alarmType,
+                    timerMinutes = timerMinutes
+                )
+            )
+        }
     }
 
     fun deleteRoutine(entry: RoutineEntryEntity) {
@@ -54,9 +71,11 @@ class SettingsViewModel @Inject constructor(
         settingsRepo.setTodayDelayMinutes(minutes)
     }
 
-    fun copyRoutineToDay(dayOfWeek: Int) {
+    fun copyRoutineToDays(dayOfWeeks: Set<Int>) {
         viewModelScope.launch {
-            weeklyRepo.copyRoutineToDay(dayOfWeek, routines.value)
+            dayOfWeeks.sorted().forEach { day ->
+                weeklyRepo.copyRoutineToDay(day, routines.value)
+            }
         }
     }
 

@@ -46,7 +46,7 @@ public final class RoutineEntryDao_Impl implements RoutineEntryDao {
       @Override
       @NonNull
       protected String createQuery() {
-        return "INSERT OR REPLACE INTO `routine_entries` (`id`,`hour`,`minute`,`eventName`,`sortOrder`) VALUES (nullif(?, 0),?,?,?,?)";
+        return "INSERT OR REPLACE INTO `routine_entries` (`id`,`hour`,`minute`,`eventName`,`sortOrder`,`alarmType`,`timerMinutes`) VALUES (nullif(?, 0),?,?,?,?,?,?)";
       }
 
       @Override
@@ -57,6 +57,8 @@ public final class RoutineEntryDao_Impl implements RoutineEntryDao {
         statement.bindLong(3, entity.getMinute());
         statement.bindString(4, entity.getEventName());
         statement.bindLong(5, entity.getSortOrder());
+        statement.bindString(6, entity.getAlarmType());
+        statement.bindLong(7, entity.getTimerMinutes());
       }
     };
     this.__deletionAdapterOfRoutineEntryEntity = new EntityDeletionOrUpdateAdapter<RoutineEntryEntity>(__db) {
@@ -76,7 +78,7 @@ public final class RoutineEntryDao_Impl implements RoutineEntryDao {
       @Override
       @NonNull
       protected String createQuery() {
-        return "UPDATE OR ABORT `routine_entries` SET `id` = ?,`hour` = ?,`minute` = ?,`eventName` = ?,`sortOrder` = ? WHERE `id` = ?";
+        return "UPDATE OR ABORT `routine_entries` SET `id` = ?,`hour` = ?,`minute` = ?,`eventName` = ?,`sortOrder` = ?,`alarmType` = ?,`timerMinutes` = ? WHERE `id` = ?";
       }
 
       @Override
@@ -87,7 +89,9 @@ public final class RoutineEntryDao_Impl implements RoutineEntryDao {
         statement.bindLong(3, entity.getMinute());
         statement.bindString(4, entity.getEventName());
         statement.bindLong(5, entity.getSortOrder());
-        statement.bindLong(6, entity.getId());
+        statement.bindString(6, entity.getAlarmType());
+        statement.bindLong(7, entity.getTimerMinutes());
+        statement.bindLong(8, entity.getId());
       }
     };
     this.__preparedStmtOfDeleteAll = new SharedSQLiteStatement(__db) {
@@ -195,6 +199,8 @@ public final class RoutineEntryDao_Impl implements RoutineEntryDao {
           final int _cursorIndexOfMinute = CursorUtil.getColumnIndexOrThrow(_cursor, "minute");
           final int _cursorIndexOfEventName = CursorUtil.getColumnIndexOrThrow(_cursor, "eventName");
           final int _cursorIndexOfSortOrder = CursorUtil.getColumnIndexOrThrow(_cursor, "sortOrder");
+          final int _cursorIndexOfAlarmType = CursorUtil.getColumnIndexOrThrow(_cursor, "alarmType");
+          final int _cursorIndexOfTimerMinutes = CursorUtil.getColumnIndexOrThrow(_cursor, "timerMinutes");
           final List<RoutineEntryEntity> _result = new ArrayList<RoutineEntryEntity>(_cursor.getCount());
           while (_cursor.moveToNext()) {
             final RoutineEntryEntity _item;
@@ -208,7 +214,11 @@ public final class RoutineEntryDao_Impl implements RoutineEntryDao {
             _tmpEventName = _cursor.getString(_cursorIndexOfEventName);
             final int _tmpSortOrder;
             _tmpSortOrder = _cursor.getInt(_cursorIndexOfSortOrder);
-            _item = new RoutineEntryEntity(_tmpId,_tmpHour,_tmpMinute,_tmpEventName,_tmpSortOrder);
+            final String _tmpAlarmType;
+            _tmpAlarmType = _cursor.getString(_cursorIndexOfAlarmType);
+            final int _tmpTimerMinutes;
+            _tmpTimerMinutes = _cursor.getInt(_cursorIndexOfTimerMinutes);
+            _item = new RoutineEntryEntity(_tmpId,_tmpHour,_tmpMinute,_tmpEventName,_tmpSortOrder,_tmpAlarmType,_tmpTimerMinutes);
             _result.add(_item);
           }
           return _result;
