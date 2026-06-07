@@ -70,6 +70,9 @@ class AlarmActivity : ComponentActivity() {
                 restartAlarmSound(alarmId, eventName, triggerTime)
             }
         }
+        viewModel.onTimerFinished = {
+            restartAlarmSound(alarmId, eventName, triggerTime)
+        }
 
         if (alarmType == ALARM_TYPE_TIMER) {
             viewModel.startTimer(timerMinutes.coerceAtLeast(1) * 60)
@@ -82,11 +85,27 @@ class AlarmActivity : ComponentActivity() {
                     triggerTime = triggerTime,
                     alarmType = alarmType,
                     viewModel = viewModel,
-                    onStop = { stopAlarm(finish = false) },
+                    onStop = {
+                        if (alarmType == ALARM_TYPE_TIMER) {
+                            if ((viewModel.timerRemainingSeconds.value ?: 0) > 0) {
+                                viewModel.pauseTimer()
+                            } else {
+                                stopAlarm(finish = false)
+                            }
+                        } else {
+                            stopAlarm(finish = false)
+                        }
+                    },
+                    onResumeTimer = { viewModel.resumeTimer() },
                     onDone = { stopAlarm(finish = true) },
                     onSnooze = { minutes ->
                         if (alarmType == ALARM_TYPE_TIMER) {
-                            viewModel.addTimerMinutes(minutes)
+                            if ((viewModel.timerRemainingSeconds.value ?: 0) <= 0) {
+                                stopAlarmSound()
+                                viewModel.startTimer(minutes * 60)
+                            } else {
+                                viewModel.addTimerMinutes(minutes)
+                            }
                         } else {
                             stopAlarmSound()
                             viewModel.startSnooze(minutes * 60)
@@ -146,6 +165,15 @@ private fun alarmScreenEventNameFontSize(name: String): TextUnit = when {
     else -> 34.sp
 }
 
+private fun timerScreenEventNameFontSize(name: String): TextUnit = when {
+    name.length <= 4 -> 76.sp
+    name.length <= 8 -> 68.sp
+    name.length <= 12 -> 60.sp
+    name.length <= 16 -> 52.sp
+    name.length <= 24 -> 44.sp
+    else -> 36.sp
+}
+
 @Composable
 fun AlarmScreen(
     eventName: String,
@@ -153,16 +181,27 @@ fun AlarmScreen(
     alarmType: String,
     viewModel: AlarmViewModel,
     onStop: () -> Unit,
+    onResumeTimer: () -> Unit,
     onDone: () -> Unit,
     onSnooze: (Int) -> Unit
 ) {
     val countdownSeconds by viewModel.countdownSeconds.collectAsState()
     val isSnoozing by viewModel.isSnoozing.collectAsState()
     val timerRemainingSeconds by viewModel.timerRemainingSeconds.collectAsState()
+    val isTimerPaused by viewModel.isTimerPaused.collectAsState()
+    val isTimerFinished = alarmType == ALARM_TYPE_TIMER && (timerRemainingSeconds ?: 0) <= 0
 
-    val timeStr = remember(triggerTime) {
-        if (triggerTime == 0L) "" else
-            SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(triggerTime))
+    var currentTimeMillis by remember { mutableLongStateOf(System.currentTimeMillis()) }
+
+    LaunchedEffect(Unit) {
+        while (true) {
+            currentTimeMillis = System.currentTimeMillis()
+            kotlinx.coroutines.delay(1000L)
+        }
+    }
+
+    val timeStr = remember(currentTimeMillis) {
+        SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(currentTimeMillis))
     }
 
     Box(
@@ -176,43 +215,61 @@ fun AlarmScreen(
             verticalArrangement = Arrangement.Center,
             modifier = Modifier.padding(32.dp)
         ) {
+            // アラーム時刻
+            Text(
+                text = timeStr,
+                fontSize = if (alarmType == ALARM_TYPE_TIMER) 42.sp else 72.sp,
+                fontWeight = FontWeight.Thin,
+                color = Color.White,
+                modifier = Modifier.padding(bottom = if (alarmType == ALARM_TYPE_TIMER) 14.dp else 8.dp)
+            )
+
             if (alarmType == ALARM_TYPE_TIMER) {
                 val remaining = timerRemainingSeconds ?: 0
                 val mins = remaining / 60
                 val secs = remaining % 60
                 Text(
-                    text = "タイマー %02d:%02d".format(mins, secs),
-                    fontSize = 34.sp,
+                    text = "%02d:%02d".format(mins, secs),
+                    fontSize = 78.sp,
                     color = Color(0xFFFFE082),
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
             }
 
-            // アラーム時刻
-            Text(
-                text = timeStr,
-                fontSize = 72.sp,
-                fontWeight = FontWeight.Thin,
-                color = Color.White,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
-
             // イベント名
             if (eventName.isNotBlank()) {
                 Text(
                     text = eventName,
-                    fontSize = alarmScreenEventNameFontSize(eventName),
+                    fontSize = if (alarmType == ALARM_TYPE_TIMER) {
+                        timerScreenEventNameFontSize(eventName)
+                    } else {
+                        alarmScreenEventNameFontSize(eventName)
+                    },
                     fontWeight = FontWeight.Bold,
                     color = Color(0xFFBBDEFB),
                     textAlign = TextAlign.Center,
                     maxLines = 2,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(bottom = 24.dp)
+                        .padding(bottom = if (alarmType == ALARM_TYPE_TIMER) 8.dp else 24.dp)
                 )
             } else {
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(if (alarmType == ALARM_TYPE_TIMER) 8.dp else 24.dp))
+            }
+
+            if (alarmType == ALARM_TYPE_TIMER) {
+                Text(
+                    text = when {
+                        isTimerFinished -> "タイマー完了"
+                        isTimerPaused -> "停止中"
+                        else -> "タイマー実行中"
+                    },
+                    fontSize = 16.sp,
+                    color = Color.White.copy(alpha = 0.72f),
+                    fontWeight = FontWeight.Medium,
+                    modifier = Modifier.padding(bottom = 24.dp)
+                )
             }
 
             // スヌーズカウントダウン
@@ -254,11 +311,27 @@ fun AlarmScreen(
             // 停止 / 完了
             Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                 Button(
-                    onClick = onStop,
+                    onClick = {
+                        if (alarmType == ALARM_TYPE_TIMER && isTimerPaused && !isTimerFinished) {
+                            onResumeTimer()
+                        } else {
+                            onStop()
+                        }
+                    },
                     modifier = Modifier.weight(1f).height(56.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF616161))
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = if (alarmType == ALARM_TYPE_TIMER && isTimerPaused && !isTimerFinished) {
+                            Color(0xFF43A047)
+                        } else {
+                            Color(0xFF616161)
+                        }
+                    )
                 ) {
-                    Text("停止", fontSize = 18.sp, color = Color.White)
+                    Text(
+                        if (alarmType == ALARM_TYPE_TIMER && isTimerPaused && !isTimerFinished) "再開" else "停止",
+                        fontSize = 18.sp,
+                        color = Color.White
+                    )
                 }
                 Button(
                     onClick = onDone,
