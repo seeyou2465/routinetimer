@@ -10,13 +10,14 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.routinealarm.data.db.TodayAlarmEntity
 import com.routinealarm.ui.common.AlarmCardToday
 import com.routinealarm.ui.common.TimePickerDialog
-import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
@@ -27,9 +28,13 @@ fun TodayScreen(viewModel: TodayViewModel = hiltViewModel()) {
     val today by viewModel.today.collectAsState()
     var showAddDialog by remember { mutableStateOf(false) }
     var editTarget by remember { mutableStateOf<TodayAlarmEntity?>(null) }
+    var deleteTarget by remember { mutableStateOf<TodayAlarmEntity?>(null) }
 
-    val dateStr = remember(today) {
-        today.format(DateTimeFormatter.ofPattern("M月d日(E)", Locale.JAPANESE))
+    val dateText = remember(today) {
+        today.format(DateTimeFormatter.ofPattern("M月d日", Locale.JAPANESE))
+    }
+    val weekdayText = remember(today) {
+        today.format(DateTimeFormatter.ofPattern("E", Locale.JAPANESE))
     }
 
     LaunchedEffect(Unit) {
@@ -38,13 +43,10 @@ fun TodayScreen(viewModel: TodayViewModel = hiltViewModel()) {
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("本日 $dateStr", fontSize = 18.sp) },
-                actions = {
-                    IconButton(onClick = { viewModel.refresh() }) {
-                        Icon(Icons.Default.Refresh, contentDescription = "更新")
-                    }
-                }
+            TodayDateHeader(
+                dateText = dateText,
+                weekdayText = weekdayText,
+                onRefresh = { viewModel.refresh() }
             )
         },
         floatingActionButton = {
@@ -73,7 +75,7 @@ fun TodayScreen(viewModel: TodayViewModel = hiltViewModel()) {
                     AlarmCardToday(
                         alarm = alarm,
                         onToggle = { viewModel.toggleEnabled(alarm) },
-                        onDelete = { viewModel.delete(alarm) },
+                        onDelete = { deleteTarget = alarm },
                         onEdit = { editTarget = alarm }
                     )
                 }
@@ -105,4 +107,111 @@ fun TodayScreen(viewModel: TodayViewModel = hiltViewModel()) {
             }
         )
     }
+
+    deleteTarget?.let { target ->
+        DeleteTodayAlarmConfirmDialog(
+            target = target,
+            onDismiss = { deleteTarget = null },
+            onConfirm = {
+                viewModel.delete(target)
+                deleteTarget = null
+            }
+        )
+    }
+}
+
+@Composable
+private fun TodayDateHeader(
+    dateText: String,
+    weekdayText: String,
+    onRefresh: () -> Unit
+) {
+    Surface(
+        color = MaterialTheme.colorScheme.surface,
+        tonalElevation = 2.dp,
+        shadowElevation = 2.dp
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(min = 68.dp)
+                .padding(horizontal = 16.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Surface(
+                modifier = Modifier
+                    .width(4.dp)
+                    .height(38.dp),
+                shape = RoundedCornerShape(12.dp),
+                color = MaterialTheme.colorScheme.primary
+            ) {}
+
+            Spacer(modifier = Modifier.width(12.dp))
+
+            Column(modifier = Modifier.weight(1f)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = dateText,
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Surface(
+                        shape = RoundedCornerShape(50),
+                        color = MaterialTheme.colorScheme.primaryContainer
+                    ) {
+                        Text(
+                            text = weekdayText,
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
+                        )
+                    }
+                }
+            }
+
+            FilledTonalIconButton(onClick = onRefresh) {
+                Icon(Icons.Default.Refresh, contentDescription = "更新")
+            }
+        }
+    }
+}
+
+@Composable
+private fun DeleteTodayAlarmConfirmDialog(
+    target: TodayAlarmEntity,
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("アラームを削除") },
+        text = {
+            Text(
+                "「%02d:%02d %s」を削除しますか？".format(
+                    target.hour,
+                    target.minute,
+                    target.eventName.ifBlank { "名称なし" }
+                )
+            )
+        },
+        confirmButton = {
+            Button(
+                onClick = onConfirm,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.error,
+                    contentColor = MaterialTheme.colorScheme.onError
+                )
+            ) {
+                Text("削除")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("キャンセル")
+            }
+        }
+    )
 }

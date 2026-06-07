@@ -17,6 +17,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.routinealarm.service.AlarmScheduler
@@ -117,6 +119,15 @@ class AlarmActivity : ComponentActivity() {
     }
 }
 
+private fun alarmScreenEventNameFontSize(name: String): TextUnit = when {
+    name.length <= 4 -> 72.sp
+    name.length <= 8 -> 64.sp
+    name.length <= 12 -> 56.sp
+    name.length <= 16 -> 48.sp
+    name.length <= 24 -> 40.sp
+    else -> 34.sp
+}
+
 @Composable
 fun AlarmScreen(
     eventName: String,
@@ -158,9 +169,14 @@ fun AlarmScreen(
             if (eventName.isNotBlank()) {
                 Text(
                     text = eventName,
-                    fontSize = 24.sp,
+                    fontSize = alarmScreenEventNameFontSize(eventName),
+                    fontWeight = FontWeight.Bold,
                     color = Color(0xFFBBDEFB),
-                    modifier = Modifier.padding(bottom = 24.dp)
+                    textAlign = TextAlign.Center,
+                    maxLines = 2,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 24.dp)
                 )
             } else {
                 Spacer(modifier = Modifier.height(24.dp))

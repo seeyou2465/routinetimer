@@ -1,10 +1,10 @@
 [
     {
-        "merged": "C:\\Users\\socce\\.gradle\\daemon\\9.0-milestone-1\\com.routinealarm.app-debug-59:\\drawable_ic_alarm.xml.flat",
-        "source": "C:\\Users\\socce\\.gradle\\daemon\\9.0-milestone-1\\com.routinealarm.app-main-61:\\drawable\\ic_alarm.xml"
-    },
-    {
         "merged": "com.routinealarm.app-debug-59:/font_mplus_rounded.ttf.flat",
         "source": "com.routinealarm.app-main-61:/font/mplus_rounded.ttf"
+    },
+    {
+        "merged": "com.routinealarm.app-debug-59:/drawable_ic_alarm.xml.flat",
+        "source": "com.routinealarm.app-main-61:/drawable/ic_alarm.xml"
     }
 ]

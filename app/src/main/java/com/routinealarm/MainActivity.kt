@@ -11,25 +11,21 @@ import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CalendarToday
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.ViewWeek
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavDestination.Companion.hierarchy
-import androidx.navigation.NavGraph.Companion.findStartDestination
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
 import com.routinealarm.ui.settings.SettingsScreen
 import com.routinealarm.ui.theme.RoutineAlarmTheme
 import com.routinealarm.ui.today.TodayScreen
 import com.routinealarm.ui.week.WeekScreen
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -82,52 +78,55 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-private enum class Screen(val route: String, val label: String) {
-    Today("today", "本日"),
-    Week("week", "曜日"),
-    Settings("settings", "設定")
+private enum class Screen(val label: String) {
+    Today("本日"),
+    Week("曜日"),
+    Settings("設定")
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun MainNavigation() {
-    val navController = rememberNavController()
-    val navBackStack by navController.currentBackStackEntryAsState()
-    val currentDest = navBackStack?.destination
+    val screens = listOf(Screen.Today, Screen.Week, Screen.Settings)
+    val pagerState = rememberPagerState(pageCount = { screens.size })
+    val coroutineScope = rememberCoroutineScope()
 
-    Scaffold(
-        bottomBar = {
-            NavigationBar {
-                val items = listOf(
-                    Triple(Screen.Today, Icons.Default.CalendarToday, "本日"),
-                    Triple(Screen.Week, Icons.Default.ViewWeek, "曜日"),
-                    Triple(Screen.Settings, Icons.Default.Settings, "設定")
-                )
-                items.forEach { (screen, icon, label) ->
-                    NavigationBarItem(
-                        icon = { Icon(icon, contentDescription = label) },
-                        label = { Text(label) },
-                        selected = currentDest?.hierarchy?.any { it.route == screen.route } == true,
+    Scaffold(containerColor = MaterialTheme.colorScheme.background) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+        ) {
+            TabRow(
+                selectedTabIndex = pagerState.currentPage,
+                containerColor = MaterialTheme.colorScheme.surface,
+                contentColor = MaterialTheme.colorScheme.onSurface
+            ) {
+                screens.forEachIndexed { index, screen ->
+                    Tab(
+                        selected = pagerState.currentPage == index,
                         onClick = {
-                            navController.navigate(screen.route) {
-                                popUpTo(navController.graph.findStartDestination().id) { saveState = true }
-                                launchSingleTop = true
-                                restoreState = true
+                            coroutineScope.launch {
+                                pagerState.animateScrollToPage(index)
                             }
-                        }
+                        },
+                        selectedContentColor = MaterialTheme.colorScheme.primary,
+                        unselectedContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        text = { Text(screen.label) }
                     )
                 }
             }
-        }
-    ) { innerPadding ->
-        NavHost(
-            navController = navController,
-            startDestination = Screen.Today.route,
-            modifier = Modifier.padding(innerPadding)
-        ) {
-            composable(Screen.Today.route) { TodayScreen() }
-            composable(Screen.Week.route) { WeekScreen() }
-            composable(Screen.Settings.route) { SettingsScreen() }
+
+        HorizontalPager(
+            state = pagerState,
+            modifier = Modifier.weight(1f)
+        ) { page ->
+            when (screens[page]) {
+                Screen.Today -> TodayScreen()
+                Screen.Week -> WeekScreen()
+                Screen.Settings -> SettingsScreen()
+            }
         }
     }
+}
 }
